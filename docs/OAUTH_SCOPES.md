@@ -18,7 +18,7 @@ add-on has no reason to reach any other file.
 **What it does:** per-file access to files the add-on itself creates.
 
 **Justification.** Recordings are saved as WAV files in a folder the add-on creates
-(`Slides Audio Recorder / <presentation name>`). The add-on needs to create that folder, upload the
+(`Slide Audio Recordings / <presentation name>`). The add-on needs to create that folder, upload the
 audio, read back the file's link and name, apply the sharing the teacher chose, rename a recording,
 and move one to the bin when asked. All of that is limited to files the add-on created. The full
 `drive` scope is deliberately avoided: the add-on never uses `DriveApp` or the advanced Drive
@@ -29,7 +29,7 @@ service, because both request full Drive access; it calls the Drive REST API dir
 **What it does:** show the sidebar and dialogs inside Google Slides.
 
 **Justification.** The entire user interface is a sidebar opened from
-*Extensions ▸ Slides Audio Recorder*, plus a short help dialog.
+*Extensions ▸ Audio Recorder*, plus a short help dialog.
 
 ## `https://www.googleapis.com/auth/script.external_request`
 

@@ -28,7 +28,7 @@
                                                       └──────────┬────────────┘
                                                                  │ drive.file
                                                                  ▼
-                                            Drive: Slides Audio Recorder / <deck> / *.wav
+                                            Drive: Slide Audio Recordings / <deck> / *.wav
                                                                  │
                                                                  ▼
                                             Slides: linked play control on the current slide

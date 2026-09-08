@@ -185,8 +185,10 @@
       slide: boot.slide && boot.slide.number ? String(boot.slide.number) : ''
     });
 
-    var width = 420;
-    var height = 460;
+    // Close to the 312px sidebar, so the two windows read as one product and
+    // the twelve-bar meter keeps its proportions.
+    var width = 360;
+    var height = 420;
     var left = Math.max(0, (window.screen.availWidth || 1200) - width - 60);
     var top = Math.max(0, Math.round(((window.screen.availHeight || 800) - height) / 2));
     recorderWindow = window.open(url, 'initioAudioRecorder',
@@ -198,7 +200,7 @@
            'the record button again.');
       return;
     }
-    el.idleHint.textContent = 'Allow the microphone in the window that opened';
+    el.idleHint.textContent = 'Recording in the other window';
     watchForClose();
   }
 
@@ -529,7 +531,7 @@
     }
     el.nativeName.value = recording.name;
     el.demoFile.textContent = recording.name;
-    el.nativePath.textContent = 'Saved in My Drive › Slides Audio Recorder › ' +
+    el.nativePath.textContent = 'Saved in My Drive › Slide Audio Recordings › ' +
         (boot.presentation ? boot.presentation.name : 'this presentation');
   }
 

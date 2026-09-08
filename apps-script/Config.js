@@ -35,8 +35,14 @@ var MAX_RECORDING_BYTES = 100 * 1024 * 1024;
 /** How long a half-finished upload session stays resumable, in seconds. */
 var UPLOAD_SESSION_TTL_SECONDS = 6 * 60 * 60;
 
-/** Name of the Drive folder the add-on keeps its recordings in. */
-var ROOT_FOLDER_NAME = 'Slides Audio Recorder';
+/**
+ * Top-level Drive folder for recordings, with one subfolder per presentation.
+ *
+ * Changing this only affects users who have not recorded yet: the folder id is
+ * remembered per user, so an existing folder keeps the name it was created
+ * with rather than being renamed underneath someone.
+ */
+var ROOT_FOLDER_NAME = 'Slide Audio Recordings';
 
 /** Document Property key holding this presentation's recording index. */
 var PROP_RECORDINGS = 'recordings.v1';

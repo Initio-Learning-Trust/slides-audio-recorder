@@ -82,7 +82,7 @@ can be saved.
 ### 3. Test it before publishing anything
 
 1. `npx clasp open`, then **Deploy ▸ Test deployments ▸ Install**.
-2. Open a presentation and choose **Extensions ▸ Slides Audio Recorder ▸ Record audio**.
+2. Open a presentation and choose **Extensions ▸ Audio Recorder ▸ Record audio**.
 3. Work through [TESTING.md](TESTING.md).
 
 ### 4. Point the add-on at your recorder (only if you changed it)

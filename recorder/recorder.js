@@ -158,7 +158,9 @@
       el.btnRecord.setAttribute('aria-label', 'Stop recording');
       el.stack.classList.add('is-live');
       el.statusRow.hidden = false;
-      el.scope.classList.remove('is-idle');
+      el.scope.hidden = false;
+      // Shimmer until the first meter values arrive a fraction of a second later.
+      el.scope.classList.add('is-idle');
       el.note.textContent = 'Keep this window open until you stop.';
       setHint('Tap to stop');
 
@@ -298,6 +300,9 @@
    * @param {!Array<number>} values One value per bar.
    */
   function paintScope(values) {
+    if (values.length) {
+      el.scope.classList.remove('is-idle');
+    }
     for (var i = 0; i < el.bars.length; i++) {
       el.bars[i].style.transform = 'scaleY(' + (values[i] || 0.14).toFixed(3) + ')';
     }
@@ -367,11 +372,12 @@
     el.btnRecord.setAttribute('aria-label', 'Start recording');
     el.stack.classList.remove('is-live');
     el.statusRow.hidden = true;
+    el.scope.hidden = true;
     el.scope.classList.add('is-idle');
-    paintScope([]);
 
     if (!state.sampleCount) {
       el.btnRecord.disabled = false;
+      el.note.textContent = 'Your browser will ask for the microphone.';
       setHint('Tap to record');
       showError('No audio was captured. Check that the right microphone is selected and try again.');
       post(SarProtocol.TYPES.STATE, { state: 'idle' });
@@ -468,6 +474,7 @@
     if (data.type === SarProtocol.TYPES.REJECTED) {
       state.sending = false;
       el.btnRecord.disabled = false;
+      el.note.textContent = 'Your browser will ask for the microphone.';
       setHint('Tap to record');
       showError(data.message || 'Google Slides could not save that recording. Please try again.');
     }
@@ -491,14 +498,7 @@
       showError('This browser cannot record audio. Try the latest Chrome, Edge, Firefox or Safari.');
       el.btnRecord.disabled = true;
     }
-    var context = [];
-    if (params.slide) {
-      context.push('Slide ' + params.slide);
-    }
-    if (params.label) {
-      context.push(params.label);
-    }
-    el.context.textContent = context.join(' · ');
+    el.context.textContent = params.slide ? 'Slide ' + params.slide : '';
 
     window.addEventListener('message', onMessage);
     post(SarProtocol.TYPES.READY, {});

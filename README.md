@@ -14,7 +14,7 @@ Google Slides sidebar  ──►  recording window  ──►  Drive (WAV)  ─�
 
 - **Record from the sidebar.** One button opens a small recording window; the sidebar shows the
   live waveform and timer, and you review and name the take there. Re-record until you are happy.
-- **Save to Drive automatically.** Recordings go into `Slides Audio Recorder / <presentation name>`
+- **Save to Drive automatically.** Recordings go into `Slide Audio Recordings / <presentation name>`
   as 16-bit WAV, named by slide number so they are easy to find later.
 - **Insert with one click.** A play control (blue button, small round button, or plain hyperlinked
   text) is added to the current slide, linked to the recording.

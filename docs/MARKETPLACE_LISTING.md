@@ -33,7 +33,7 @@ BUILT FOR LANGUAGE TEACHING
 - Give instructions in the target language for students who need to hear them again
 
 HOW IT WORKS
-1. Extensions > Slides Audio Recorder > Record audio
+1. Extensions > Audio Recorder > Record audio
 2. Tap the record button. A small recording window opens - allow your microphone once.
 3. Tap record there and speak. The waveform moves in the sidebar as you talk.
 4. Tap it again to stop. The window closes and your take appears in the sidebar to listen back to.
@@ -54,7 +54,7 @@ what was applied.
 EVERYTHING IN ONE PLACE
 Every recording made in a presentation is listed in the sidebar. Play it back, add it to another
 slide, rename it or move it to the bin. Files live in a tidy folder in your own Drive:
-Slides Audio Recorder / <your presentation name>.
+Slide Audio Recordings / <your presentation name>.
 
 PLAY INSIDE THE SLIDE
 Google does not let add-ons place its native audio icon, so the button we add opens the recording in

@@ -33,6 +33,14 @@
 
 * { box-sizing: border-box; }
 
+/*
+ * The hidden attribute sets display:none through the UA stylesheet, which any
+ * author rule with its own display value silently overrides. Components here
+ * are flex, so state them together once rather than remembering per rule.
+ */
+[hidden] { display: none !important; }
+
+
 body {
   margin: 0;
   background: var(--surface);
