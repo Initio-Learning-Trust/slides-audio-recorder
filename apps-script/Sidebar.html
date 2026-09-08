@@ -8,14 +8,24 @@
 <body>
 <div class="app">
   <header>
-    <img class="mark" id="mark" src="" alt="">
+    <img class="mark" id="mark" alt="">
     <h1 id="title">Audio Recorder</h1>
     <span class="where" id="where"></span>
   </header>
 
   <main>
+    <!-- LOADING: held until getBootstrap answers, so nothing arrives half-filled -->
+    <section class="panel" data-panel="loading" data-active>
+      <div class="skeleton" style="height:38px"></div>
+      <div class="recWrap">
+        <div class="skeleton circle"></div>
+        <div class="skeleton" style="height:12px;width:96px"></div>
+      </div>
+      <div class="err" id="loading-err" hidden></div>
+    </section>
+
     <!-- IDLE -->
-    <section class="panel" data-panel="idle" data-active>
+    <section class="panel" data-panel="idle">
       <p class="lead">Recording opens in a separate window. Name it there, and it is saved to your
         Drive ready to add to this slide.</p>
 

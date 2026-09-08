@@ -90,7 +90,7 @@
    * @param {string} message Text, or empty to clear.
    */
   function fail(message) {
-    ['idle-err', 'rec-err', 'saving-err', 'settings-err'].forEach(function (id) {
+    ['loading-err', 'idle-err', 'rec-err', 'saving-err', 'settings-err'].forEach(function (id) {
       var box = $(id);
       box.hidden = true;
       box.textContent = '';
@@ -98,8 +98,8 @@
     if (!message) {
       return;
     }
-    var target = { rec: 'rec-err', saving: 'saving-err', settings: 'settings-err' }[current()] ||
-        'idle-err';
+    var target = { loading: 'loading-err', rec: 'rec-err', saving: 'saving-err',
+      settings: 'settings-err' }[current()] || 'idle-err';
     var box = $(target);
     box.textContent = message;
     box.hidden = false;
@@ -526,7 +526,7 @@
    * @return {string} Short description.
    */
   function sharingWord(mode) {
-    return { anyone: 'anyone with link', domain: 'your organisation', private: 'private' }[mode] || '';
+    return { anyone: 'anyone with link', domain: 'organisation', private: 'private' }[mode] || '';
   }
 
   /**
@@ -648,6 +648,8 @@
   /** Wires the UI and loads state from the server. */
   function init() {
     cacheElements();
+    // Inlined by the build, so it can be shown before anything is fetched.
+    el.mark.src = BRAND_ICON;
 
     el.btnRecord.addEventListener('click', openRecorder);
     el.btnStop.addEventListener('click', function () {
@@ -677,7 +679,6 @@
 
     call('getBootstrap').then(function (data) {
       boot = data;
-      el.mark.src = BRAND_ICON;
       el.title.textContent = boot.addonName;
       el.version.textContent = boot.addonName + ' · v' + boot.version;
       el.linkHelp.href = boot.supportUrl;
@@ -690,6 +691,7 @@
       el.where.textContent = boot.slide && boot.slide.number ?
           'Slide ' + boot.slide.number + ' of ' + boot.slide.total : '';
       el.btnRecord.disabled = false;
+      show('idle');
     }).catch(function (err) {
       fail('The add-on could not start: ' + err.message);
     });
