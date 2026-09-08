@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock sidebar</title>
+</head>
+<body>
+<!--
+  Stands in for the Apps Script sidebar during end-to-end tests.
+
+  It is served from a different origin to the recorder, exactly as the real
+  sidebar is (googleusercontent.com vs our static host), so the test exercises
+  the real cross-origin postMessage path rather than a same-origin shortcut.
+-->
+<h1>Mock sidebar</h1>
+<button type="button" id="open">Record</button>
+<pre id="log"></pre>
+
+<script src="/lib/protocol.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var params = new URLSearchParams(location.search);
+  var recorderBase = params.get('recorder');
+  var recorderOrigin = new URL(recorderBase).origin;
+  var nonce = 'test-nonce-' + Math.random().toString(16).slice(2);
+  var popup = null;
+
+  // Everything the test asserts on is published here.
+  window.__harness = {
+    nonce: nonce,
+    events: [],
+    audio: null,
+    ackSent: false
+  };
+
+  /**
+   * @param {string} message Line to record.
+   */
+  function log(message) {
+    window.__harness.events.push(message);
+    document.getElementById('log').textContent += message + '\n';
+  }
+
+  document.getElementById('open').addEventListener('click', function () {
+    var url = SarProtocol.buildLaunchUrl(recorderBase, {
+      origin: location.origin,
+      nonce: nonce,
+      sampleRate: 22050,
+      maxBytes: 10 * 1024 * 1024,
+      label: 'Bonjour',
+      slide: '3'
+    });
+    popup = window.open(url, 'recorder', 'popup=yes,width=480,height=660');
+    window.__harness.popupOpened = !!popup;
+    log('opened ' + (popup ? 'ok' : 'BLOCKED'));
+  });
+
+  window.addEventListener('message', function (event) {
+    // Deliberately run untrusted traffic through the same guard the real
+    // sidebar uses, so the test proves the guard lets real messages through.
+    var data = SarProtocol.accept(event, recorderOrigin, nonce);
+    if (!data) {
+      log('rejected message from ' + event.origin);
+      return;
+    }
+    log('accepted ' + data.type);
+
+    if (data.type === SarProtocol.TYPES.READY) {
+      popup.postMessage(SarProtocol.envelope(SarProtocol.TYPES.ACK, nonce), recorderOrigin);
+      window.__harness.ackSent = true;
+      return;
+    }
+    if (data.type === SarProtocol.TYPES.AUDIO) {
+      var bytes = new Uint8Array(data.buffer);
+      window.__harness.audio = {
+        byteLength: bytes.length,
+        sampleRate: data.sampleRate,
+        durationMs: data.durationMs,
+        label: data.label,
+        mimeType: data.mimeType,
+        header: String.fromCharCode.apply(null, bytes.subarray(0, 4)) +
+                String.fromCharCode.apply(null, bytes.subarray(8, 12)),
+        // Peak absolute sample, to prove the fake microphone was actually heard.
+        peak: (function () {
+          var view = new DataView(data.buffer);
+          var peak = 0;
+          for (var i = 44; i + 1 < bytes.length; i += 2) {
+            var value = Math.abs(view.getInt16(i, true));
+            if (value > peak) {
+              peak = value;
+            }
+          }
+          return peak;
+        }())
+      };
+      popup.postMessage(SarProtocol.envelope(SarProtocol.TYPES.ACCEPTED, nonce), recorderOrigin);
+    }
+  });
+}());
+</script>
+</body>
+</html>

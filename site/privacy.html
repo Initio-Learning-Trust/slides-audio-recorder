@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy — Slides Audio Recorder</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <p><a href="index.html">&larr; Slides Audio Recorder</a></p>
+  <h1>Privacy policy</h1>
+  <p class="lede" style="text-align:left">Last updated 8 September 2026.</p>
+
+  <section>
+    <h2>The short version</h2>
+    <p>Slides Audio Recorder records audio in your browser and saves it to your own Google Drive. We
+      do not operate a server that receives your recordings, and we cannot see them, your slides, or
+      anything else in your Google account.</p>
+  </section>
+
+  <section>
+    <h2>Who we are</h2>
+    <p>Slides Audio Recorder is published by Initio Learning Trust. For anything in this policy,
+      contact us at <strong>[insert contact address]</strong>.</p>
+  </section>
+
+  <section>
+    <h2>What the add-on accesses</h2>
+    <table>
+      <tr><th>Permission</th><th>Why</th></tr>
+      <tr>
+        <td>The presentation you have open (<code>presentations.currentonly</code>)</td>
+        <td>To add a play control to the slide you are on, and to read the slide list so recordings
+          can be labelled with the right slide number. No other presentation is accessible.</td>
+      </tr>
+      <tr>
+        <td>Files the add-on creates (<code>drive.file</code>)</td>
+        <td>To save your recordings, apply the sharing you choose, rename them and move them to the
+          bin when you ask. The add-on cannot see any other file in your Drive.</td>
+      </tr>
+      <tr>
+        <td>Show a sidebar (<code>script.container.ui</code>)</td>
+        <td>The add-on's entire interface.</td>
+      </tr>
+      <tr>
+        <td>Make outbound requests (<code>script.external_request</code>)</td>
+        <td>Used only to call the Google Drive API. The add-on's manifest restricts outbound requests
+          to <code>https://www.googleapis.com/</code>, so it cannot contact anywhere else.</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>What happens to a recording</h2>
+    <ol>
+      <li>Audio is captured by the recording window running in your browser, using the microphone
+        you allow. Nothing is uploaded while you record.</li>
+      <li>When you press <em>Use recording</em>, the audio is passed from that window to the add-on
+        sidebar inside Google Slides, in your browser.</li>
+      <li>The sidebar sends it to the add-on's Google Apps Script code, which writes it into your own
+        Google Drive.</li>
+    </ol>
+    <p>Recordings are stored in your Google Drive, under your Google account, subject to Google's
+      terms and your organisation's policies. They are not copied anywhere else.</p>
+  </section>
+
+  <section>
+    <h2>The recording window</h2>
+    <p>The recording window is a static page served from our website. It contains no analytics, no
+      advertising, no third-party scripts and no tracking of any kind. It sets no cookies, writes no
+      browser storage, holds no sign-in credentials, and makes no network requests once it has
+      loaded. Standard web-server request logs may record that the page was fetched, in the same way
+      as for any web page.</p>
+  </section>
+
+  <section>
+    <h2>Sharing</h2>
+    <p>The add-on applies the sharing you choose in Settings to each recording as it is saved:
+      your organisation, anyone with the link, or private. Changing this setting affects new
+      recordings; existing files keep the sharing they were given until you change it. You can change
+      any recording's sharing yourself in Google Drive at any time.</p>
+    <p>Please consider your school's own policies before sharing recordings of pupils' voices, and
+      before recording anyone without their knowledge.</p>
+  </section>
+
+  <section>
+    <h2>Data we collect</h2>
+    <p>None. We do not collect, store, process or transmit your recordings, your presentations, your
+      name, your email address or any usage analytics. There is no account to create and no sign-in
+      to our systems, because there are no systems of ours to sign into.</p>
+    <p>The add-on stores small amounts of information inside your own Google account: your
+      preferences (recording quality, sharing choice, button style) and a list of the recordings made
+      in each presentation. These are held in Google's Apps Script properties for your account and
+      document, and are removed when you uninstall the add-on or delete the presentation.</p>
+  </section>
+
+  <section>
+    <h2>Google API Services User Data Policy</h2>
+    <p>Slides Audio Recorder's use and transfer of information received from Google APIs adheres to
+      the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank"
+      rel="noopener">Google API Services User Data Policy</a>, including the Limited Use
+      requirements. We do not transfer this data to anyone, use it for advertising, or allow humans
+      to read it.</p>
+  </section>
+
+  <section>
+    <h2>Removing the add-on</h2>
+    <p>Uninstall it from <em>Extensions ▸ Add-ons ▸ Manage add-ons</em>, or revoke its access at
+      <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">your Google
+      account permissions page</a>. Your recordings stay in your Drive; delete them there if you want
+      them gone.</p>
+  </section>
+
+  <section>
+    <h2>Changes</h2>
+    <p>If this policy changes materially, the updated version will be published here with a new date
+      and, where the change affects what the add-on accesses, noted in the release notes.</p>
+  </section>
+
+  <footer>
+    <p>Made by Initio Learning Trust. Google Slides, Google Drive and Google Workspace are trademarks
+      of Google LLC. This add-on is not created or endorsed by Google.</p>
+  </footer>
+</main>
+</body>
+</html>
