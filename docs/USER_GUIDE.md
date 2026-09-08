@@ -102,3 +102,7 @@ music.
 | The recording window says the sidebar did not answer | Close the window, reopen the sidebar, press Record |
 | Students say the audio will not play | Check **Settings ▸ Who can listen**, then use **Add to slide** again |
 | The play button vanished | It is an ordinary shape — check whether it was deleted or moved off-slide |
+
+If you are reporting a fault, **Extensions ▸ Slides Audio Recorder ▸ Diagnose microphone access**
+prints what your browser is allowing. Copy that output into your support request. A "NO" against the
+add-on's own window is normal and expected — it is why recording opens a separate window.

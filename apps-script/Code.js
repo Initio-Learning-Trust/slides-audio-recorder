@@ -18,6 +18,7 @@ function onOpen(e) {
   menu.addItem('Record audio', 'showSidebar');
   menu.addItem('Open recordings folder', 'openRecordingsFolder');
   menu.addSeparator();
+  menu.addItem('Diagnose microphone access', 'showDiagnostics');
   menu.addItem('Help', 'showHelp');
   menu.addToUi();
 }
@@ -38,6 +39,17 @@ function showSidebar() {
       .setTitle(ADDON_NAME)
       .setWidth(320);
   SlidesApp.getUi().showSidebar(html);
+}
+
+/**
+ * Shows the microphone permissions diagnostic in a dialog.
+ *
+ * Support tool: when a teacher reports that recording will not work, this says
+ * whether the browser blocked the microphone or something else did.
+ */
+function showDiagnostics() {
+  var html = HtmlService.createHtmlOutputFromFile('Diagnostics').setWidth(520).setHeight(460);
+  SlidesApp.getUi().showModalDialog(html, 'Microphone access diagnostic');
 }
 
 /** Shows a short help dialog pointing at the full guide. */

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  body { font: 13px/1.5 Roboto, Arial, sans-serif; margin: 0; padding: 14px; color: #202124; }
+  h2 { font-size: 14px; margin: 0 0 4px; }
+  p.sub { color: #5f6368; margin: 0 0 14px; }
+  .row { border-top: 1px solid #dadce0; padding: 10px 0; }
+  .row:first-of-type { border-top: 0; }
+  .q { font-weight: 500; }
+  .a { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; word-break: break-word; }
+  .yes { color: #188038; }
+  .no { color: #d93025; }
+  textarea { width: 100%; height: 120px; font: 12px ui-monospace, Menlo, Consolas, monospace; margin-top: 10px; }
+</style>
+</head>
+<body>
+<h2>Microphone access diagnostic</h2>
+<p class="sub">Reports what this page is actually allowed to do, in this browser, right now.
+  <strong>A "NO" below is expected</strong>: Google blocks the microphone inside add-on windows,
+  which is precisely why recording happens in a separate window. This page exists so support can
+  tell that restriction apart from a genuine microphone problem.</p>
+<div id="out"></div>
+<textarea id="copy" readonly aria-label="Results to copy"></textarea>
+
+<script>
+(function () {
+  'use strict';
+
+  var lines = [];
+  var out = document.getElementById('out');
+
+  /**
+   * Renders one question and its answer.
+   * @param {string} question What was checked.
+   * @param {string} answer The result.
+   * @param {?boolean} good True for a pass, false for a fail, null for neutral.
+   */
+  function report(question, answer, good) {
+    var row = document.createElement('div');
+    row.className = 'row';
+    var q = document.createElement('div');
+    q.className = 'q';
+    q.textContent = question;
+    var a = document.createElement('div');
+    a.className = 'a' + (good === true ? ' yes' : (good === false ? ' no' : ''));
+    a.textContent = answer;
+    row.appendChild(q);
+    row.appendChild(a);
+    out.appendChild(row);
+    lines.push(question + '\n  ' + answer);
+    document.getElementById('copy').value = lines.join('\n');
+  }
+
+  /**
+   * @param {!Document} doc Document to inspect.
+   * @return {?Object} The permissions policy object, under either name.
+   */
+  function policyOf(doc) {
+    return doc.permissionsPolicy || doc.featurePolicy || null;
+  }
+
+  // 1. Where is this code actually running?
+  report('Page URL', location.href, null);
+  var ancestors = [];
+  try {
+    ancestors = Array.prototype.slice.call(location.ancestorOrigins || []);
+  } catch (err) {
+    ancestors = ['(unavailable)'];
+  }
+  report('Frames above this one (outermost last)',
+      ancestors.length ? ancestors.join('  <  ') : 'none - this is a top-level page',
+      null);
+
+  // 2. Does the permissions policy allow the microphone here?
+  var policy = policyOf(document);
+  if (policy) {
+    var allowed = policy.allowsFeature('microphone');
+    report('Permissions policy allows "microphone" in this frame?',
+        allowed ? 'YES' : 'NO - the microphone is blocked before any prompt is shown',
+        allowed);
+    try {
+      report('Features this frame IS allowed', policy.allowedFeatures().join(', ') || '(none)', null);
+    } catch (err) {
+      report('Features this frame IS allowed', '(could not enumerate)', null);
+    }
+  } else {
+    report('Permissions policy API', 'not exposed by this browser', null);
+  }
+
+  // 3. Can a nested iframe of ours regain the permission by asking for it?
+  var probe = document.createElement('iframe');
+  probe.setAttribute('allow', 'microphone *');
+  probe.srcdoc = '<!doctype html><title>probe</title>';
+  probe.style.cssText = 'width:1px;height:1px;border:0;position:absolute;left:-9999px';
+  probe.onload = function () {
+    var nested = null;
+    try {
+      nested = policyOf(probe.contentDocument);
+    } catch (err) {
+      nested = null;
+    }
+    if (nested) {
+      var nestedAllowed = nested.allowsFeature('microphone');
+      report('A nested iframe of ours, with allow="microphone", gets it?',
+          nestedAllowed ? 'YES' :
+              'NO - permissions policy is inherited, so a child cannot regain what its parent was denied',
+          nestedAllowed);
+    } else {
+      report('Nested iframe check', '(could not inspect the probe frame)', null);
+    }
+    tryMicrophone();
+  };
+  document.body.appendChild(probe);
+
+  // 4. What actually happens when we ask for the microphone?
+  function tryMicrophone() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      report('Calling getUserMedia({audio:true})', 'getUserMedia is not available at all', false);
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      stream.getTracks().forEach(function (track) {
+        track.stop();
+      });
+      report('Calling getUserMedia({audio:true})', 'SUCCEEDED - the microphone opened', true);
+    }).catch(function (err) {
+      report('Calling getUserMedia({audio:true})',
+          'FAILED - ' + err.name + ': ' + err.message, false);
+    });
+  }
+}());
+</script>
+</body>
+</html>

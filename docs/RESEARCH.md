@@ -17,6 +17,19 @@ the sidebar does not help.
 window on an origin we own, opened with `window.open()` from the sidebar. This is the same shape as
 the community "microphone bridge" pattern.
 
+**Verifying it yourself.** The add-on ships a diagnostic for exactly this claim:
+*Extensions > Slides Audio Recorder > Diagnose microphone access*. It reports the frame chain,
+whether the permissions policy allows `microphone`, whether a nested iframe of ours that asks for it
+is granted it, and what `getUserMedia()` actually throws. The same restriction applies to an Apps
+Script **web app** served by `doGet`, not just to sidebars and dialogs: Google wraps all HtmlService
+output in the same sandbox, and the `allow` attribute on that outer frame cannot be changed from
+within Apps Script.
+
+**Why an external page cannot simply be iframed into the sidebar.** Permissions Policy is inherited,
+so a child frame can never regain a permission its ancestors were denied. Setting
+`allow="microphone"` on our own iframe has no effect while Google's frame above it lacks the grant.
+An embedded recorder would look better integrated and still be unable to record.
+
 **Why not a Chrome extension?** Mote — the best-known voice tool for Slides — solves it that way,
 which is why Mote requires a Chrome extension install and does not work in Firefox or Safari. A
 popup window costs one extra window but keeps the add-on browser-agnostic and installable from the
@@ -40,7 +53,7 @@ programmable.
 | Option | Playback | Clicks | Verdict |
 | --- | --- | --- | --- |
 | Linked play control (shape with `setLinkUrl`) | Opens Drive player in a new tab | 1 | **Shipped as default.** Always works, instant. |
-| Guided `Insert ▸ Audio` | Native, inline in the slide | ~3, manual | **Shipped as a guided flow.** Best fidelity; the add-on names the file so it is top of *Recent*. |
+| Guided `Insert ▸ Audio` | Native, inline in the slide | ~3, manual | **Shipped as a guided flow.** Best fidelity; the add-on hands over the exact file name to search for. |
 | Wrap the audio in a video and use `createVideo` (source `DRIVE`) | Native, inline, supports `autoPlay`/`mute`/`start`/`end` | 1 | **Deferred.** See below. |
 
 **Why the video wrapper is deferred.** It is technically possible — record `canvas.captureStream()`
