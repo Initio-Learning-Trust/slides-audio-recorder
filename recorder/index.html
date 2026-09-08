@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Record audio for Google Slides</title>
+<link rel="icon" href="../icon.png">
+<link rel="stylesheet" href="recorder.css">
+</head>
+<body>
+<main class="shell" role="main">
+  <header class="head">
+    <h1>Record audio</h1>
+    <p class="sub" id="context">for the slide you have open</p>
+  </header>
+
+  <section class="panel" id="panel-standalone" hidden>
+    <h2>Open this from Google Slides</h2>
+    <p>This window is the microphone for the <strong>Slides Audio Recorder</strong> add-on. It has
+      nothing to record into on its own.</p>
+    <p>In your presentation choose <em>Extensions &rsaquo; Slides Audio Recorder &rsaquo; Record audio</em>,
+      then press <strong>Record</strong> in the sidebar.</p>
+  </section>
+
+  <section class="panel" id="panel-record">
+    <div class="visual">
+      <canvas id="wave" width="640" height="120" aria-hidden="true"></canvas>
+      <div class="meter" aria-hidden="true"><span id="meter-fill"></span></div>
+    </div>
+
+    <p class="timer" id="timer">0:00</p>
+    <p class="status" id="status" role="status" aria-live="polite">Ready when you are.</p>
+
+    <div class="controls">
+      <button type="button" id="btn-record" class="primary big">
+        <span class="dot" aria-hidden="true"></span> Record
+      </button>
+      <button type="button" id="btn-stop" class="primary big danger" hidden>
+        <span class="square" aria-hidden="true"></span> Stop
+      </button>
+    </div>
+
+    <div id="review" hidden>
+      <audio id="preview" controls preload="metadata"></audio>
+      <label class="field">
+        <span>Name this recording</span>
+        <input type="text" id="label" maxlength="60" placeholder="e.g. Bonjour, je m'appelle...">
+      </label>
+      <div class="controls">
+        <button type="button" id="btn-use" class="primary">Use recording</button>
+        <button type="button" id="btn-again" class="ghost">Record again</button>
+      </div>
+      <p class="hint" id="size-hint"></p>
+    </div>
+
+    <div id="sent" hidden>
+      <p class="ok">Saved to your Drive and added to the sidebar.</p>
+      <div class="controls">
+        <button type="button" id="btn-another" class="primary">Record another</button>
+        <button type="button" id="btn-close" class="ghost">Close window</button>
+      </div>
+    </div>
+
+    <p class="error" id="error" role="alert" hidden></p>
+  </section>
+
+  <footer class="foot">
+    <p>Audio is encoded in this window and handed straight to the add-on. It is never sent to any
+      other server. <a href="../privacy.html" target="_blank" rel="noopener">Privacy</a></p>
+  </footer>
+</main>
+
+<script src="lib/protocol.js"></script>
+<script src="lib/wav.js"></script>
+<script src="recorder.js"></script>
+</body>
+</html>

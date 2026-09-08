@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <?!= include('SidebarCss'); ?>
+</head>
+<body>
+
+<h1 id="title">Slides Audio Recorder</h1>
+<p class="slide-line" id="slide-line">Loading&hellip;</p>
+
+<button type="button" class="primary" id="btn-record" disabled>
+  <span class="dot" aria-hidden="true"></span> Record
+</button>
+
+<div id="progress-wrap" hidden>
+  <div class="progress"><span id="progress-bar"></span></div>
+  <p class="status" id="progress-text" role="status" aria-live="polite"></p>
+  <button type="button" class="link danger" id="btn-cancel">Cancel</button>
+</div>
+
+<div id="messages"></div>
+
+<details id="insert-options">
+  <summary>Insert options</summary>
+  <div class="card">
+    <label class="field">
+      <span>Button text</span>
+      <input type="text" id="opt-label" maxlength="60">
+    </label>
+    <label class="field">
+      <span>Style</span>
+      <select id="opt-style">
+        <option value="chip">Blue button with text</option>
+        <option value="dot">Small round play button</option>
+        <option value="text">Plain hyperlinked text</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Position on slide</span>
+      <select id="opt-position">
+        <option value="bottom-left">Bottom left</option>
+        <option value="bottom-right">Bottom right</option>
+        <option value="top-left">Top left</option>
+        <option value="top-right">Top right</option>
+        <option value="centre">Centre</option>
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" id="opt-notes">
+      <span>Also add a link in the speaker notes</span>
+    </label>
+    <label class="check">
+      <input type="checkbox" id="opt-auto">
+      <span>Add to the slide automatically after recording</span>
+    </label>
+  </div>
+</details>
+
+<div class="card">
+  <h2>Recordings in this presentation</h2>
+  <ul class="recordings" id="recordings"></ul>
+  <p class="empty" id="recordings-empty">Nothing recorded yet.</p>
+</div>
+
+<details id="native-help">
+  <summary>Play inside the slide instead (native audio)</summary>
+  <div class="card">
+    <p class="empty">Google does not let add-ons place a native audio icon, so the button above opens
+      the recording in a new tab. For playback inside the slide itself, insert the same file by hand:</p>
+    <ol class="steps">
+      <li>Choose <strong>Insert &rsaquo; Audio</strong>.</li>
+      <li>Paste the file name below into the dialog's search box &ndash; or open
+        <strong>Recent</strong>, where a just-saved recording is usually at the top.</li>
+      <li>Pick it and press <strong>Insert</strong>.</li>
+    </ol>
+    <label class="field">
+      <span>File name</span>
+      <input type="text" id="native-name" readonly value="Record something first">
+    </label>
+    <div class="row wrap">
+      <button type="button" id="btn-copy-name" disabled>Copy name</button>
+      <a id="native-folder" href="#" target="_blank" rel="noopener" hidden>Open the folder in Drive</a>
+    </div>
+    <p class="status" id="native-path"></p>
+  </div>
+</details>
+
+<details id="settings">
+  <summary>Settings</summary>
+  <div class="card">
+    <label class="field">
+      <span>Recording quality</span>
+      <select id="set-rate">
+        <option value="16000">Voice, smallest files (16 kHz)</option>
+        <option value="22050">Voice, recommended (22 kHz)</option>
+        <option value="44100">Music quality, large files (44 kHz)</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Who can listen</span>
+      <select id="set-sharing">
+        <option value="domain">Anyone in my organisation with the link</option>
+        <option value="anyone">Anyone with the link</option>
+        <option value="private">Only me</option>
+      </select>
+    </label>
+    <p class="status">Students cannot hear a recording they have no access to. This setting is applied
+      to each new recording as it is saved.</p>
+    <div class="row" style="margin-top:8px">
+      <button type="button" id="btn-save-settings">Save settings</button>
+      <a id="folder-link" href="#" target="_blank" hidden>Open Drive folder</a>
+    </div>
+  </div>
+</details>
+
+<p class="status" style="margin-top:14px">
+  <a id="support-link" href="#" target="_blank">Help and troubleshooting</a>
+</p>
+
+<?!= include('Protocol'); ?>
+<?!= include('SidebarJs'); ?>
+</body>
+</html>
