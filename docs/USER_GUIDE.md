@@ -3,7 +3,7 @@
 ## Recording your first clip
 
 1. Open your presentation and go to the slide you want the audio on.
-2. Choose **Extensions ▸ Slides Audio Recorder ▸ Record audio**. The sidebar opens on the right.
+2. Choose **Extensions ▸ Audio Recorder ▸ Record audio**. The sidebar opens on the right.
 3. Tap the round **record button**. A small recording window opens.
 4. The first time, your browser asks for microphone permission — choose **Allow**.
 5. Tap record in that window and speak. The waveform moves in both windows as you talk.
@@ -36,7 +36,7 @@ If you would rather the audio played without leaving the slide, use Google's own
 3. Select it and press **Insert**
 
 The sidebar also links straight to the Drive folder, so you can browse to it instead:
-**My Drive ▸ Slides Audio Recorder ▸ <your presentation name>**.
+**My Drive ▸ Slide Audio Recordings ▸ <your presentation name>**.
 
 You then get Google's speaker icon, which plays in place and can be set to start automatically
 (select it, then **Format options ▸ Audio playback**).
@@ -79,7 +79,7 @@ presentation**. From there you can:
 
 ## Where the files go
 
-`My Drive ▸ Slides Audio Recorder ▸ <your presentation name>`, as `.wav` files named by slide
+`My Drive ▸ Slide Audio Recordings ▸ <your presentation name>`, as `.wav` files named by slide
 number and time. They count against your Drive storage: roughly 2.6 MB per minute at the default
 quality. **Settings ▸ Recording quality** offers a smaller 16 kHz option and a 44 kHz option for
 music.
@@ -104,6 +104,6 @@ music.
 | Students say the audio will not play | Check **Settings ▸ Who can listen**, then use **Add to slide** again |
 | The play button vanished | It is an ordinary shape — check whether it was deleted or moved off-slide |
 
-If you are reporting a fault, **Extensions ▸ Slides Audio Recorder ▸ Diagnose microphone access**
+If you are reporting a fault, **Extensions ▸ Audio Recorder ▸ Diagnose microphone access**
 prints what your browser is allowing. Copy that output into your support request. A "NO" against the
 add-on's own window is normal and expected — it is why recording opens a separate window.

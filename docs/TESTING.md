@@ -41,7 +41,7 @@ CI runs both suites on every push, and additionally syntax-checks every `.js` fi
 9. A blue **▶ Listen** button is on slide 3, in the bottom-left corner.
 10. Clicking it opens the recording in Drive and it plays.
 11. The recording appears in the sidebar list with duration, size and sharing.
-12. The file is in `My Drive ▸ Slides Audio Recorder ▸ <deck name>`, named `Slide 3 - ... .wav`.
+12. The file is in `My Drive ▸ Slide Audio Recordings ▸ <deck name>`, named `Slide 3 - ... .wav`.
 
 ## Manual: the things that break
 

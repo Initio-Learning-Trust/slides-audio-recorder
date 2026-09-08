@@ -33,6 +33,14 @@
 
 * { box-sizing: border-box; }
 
+/*
+ * The hidden attribute sets display:none through the UA stylesheet, which any
+ * author rule with its own display value silently overrides. Components here
+ * are flex, so state them together once rather than remembering per rule.
+ */
+[hidden] { display: none !important; }
+
+
 body {
   margin: 0;
   background: var(--surface);
@@ -245,8 +253,8 @@ footer a { color: var(--aqua-deep); }
  * sidebar shows that instead, with no code change.
  */
 .demo {
-  position: relative; height: 128px; border-radius: 8px; overflow: hidden;
-  background: #fff; border: 1px solid var(--rule); margin-bottom: 10px;
+  position: relative; aspect-ratio: 2 / 1; min-height: 120px; border-radius: 8px;
+  overflow: hidden; background: #fff; border: 1px solid var(--rule); margin-bottom: 10px;
 }
 .demo img, .demo video { width: 100%; height: 100%; object-fit: cover; display: block; }
 

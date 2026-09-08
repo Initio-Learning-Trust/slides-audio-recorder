@@ -185,8 +185,10 @@
       slide: boot.slide && boot.slide.number ? String(boot.slide.number) : ''
     });
 
-    var width = 420;
-    var height = 460;
+    // Close to the 312px sidebar, so the two windows read as one product and
+    // the twelve-bar meter keeps its proportions.
+    var width = 360;
+    var height = 420;
     var left = Math.max(0, (window.screen.availWidth || 1200) - width - 60);
     var top = Math.max(0, Math.round(((window.screen.availHeight || 800) - height) / 2));
     recorderWindow = window.open(url, 'initioAudioRecorder',
@@ -198,7 +200,7 @@
            'the record button again.');
       return;
     }
-    el.idleHint.textContent = 'Allow the microphone in the window that opened';
+    el.idleHint.textContent = 'Recording in the other window';
     watchForClose();
   }
 
@@ -529,7 +531,7 @@
     }
     el.nativeName.value = recording.name;
     el.demoFile.textContent = recording.name;
-    el.nativePath.textContent = 'Saved in My Drive › Slides Audio Recorder › ' +
+    el.nativePath.textContent = 'Saved in My Drive › Slide Audio Recordings › ' +
         (boot.presentation ? boot.presentation.name : 'this presentation');
   }
 
@@ -785,19 +787,40 @@
 
   /**
    * Swaps the CSS demo for a supplied animation when one is configured.
-   * @param {string} url Animation URL from the HOWTO_ANIMATION_URL property.
+   *
+   * A looping GIF cannot be stopped, so when the viewer has asked for reduced
+   * motion we use the still frame if one was supplied and otherwise keep the
+   * built-in diagram, which collapses to a static state on its own.
+   *
+   * @param {{url: string, poster: string}} animation Configured URLs.
    */
-  function useSuppliedAnimation(url) {
-    var isVideo = /\.(mp4|webm|ogv)(\?|$)/i.test(url);
-    var node = document.createElement(isVideo ? 'video' : 'img');
-    node.src = url;
+  function useSuppliedAnimation(animation) {
+    var reduced = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isVideo = /\.(mp4|webm|ogv)(\?|$)/i.test(animation.url);
+    var alt = 'Choose Insert, then Audio, then pick your recording from Drive.';
+
+    if (reduced && !isVideo && !animation.poster) {
+      return;
+    }
+
+    var node;
     if (isVideo) {
-      node.autoplay = true;
+      node = document.createElement('video');
+      node.src = animation.url;
       node.loop = true;
       node.muted = true;
       node.playsInline = true;
+      node.setAttribute('aria-label', alt);
+      if (animation.poster) {
+        node.poster = animation.poster;
+      }
+      node.autoplay = !reduced;
+      node.controls = reduced;
     } else {
-      node.alt = 'How to insert audio: Insert, then Audio, then choose the file';
+      node = document.createElement('img');
+      node.src = reduced ? animation.poster : animation.url;
+      node.alt = alt;
     }
     el.demo.innerHTML = '';
     el.demo.appendChild(node);
@@ -847,8 +870,8 @@
           window.open(boot.folderUrl, '_blank', 'noopener');
         });
       }
-      if (boot.howtoAnimationUrl) {
-        useSuppliedAnimation(boot.howtoAnimationUrl);
+      if (boot.howtoAnimation && boot.howtoAnimation.url) {
+        useSuppliedAnimation(boot.howtoAnimation);
       }
       applySettings();
       renderClips();

@@ -69,3 +69,27 @@ test('every element the sidebar controller looks up exists in the sidebar markup
         'Sidebar.html has no element with id="' + id + '"');
   });
 });
+
+test('the recorder page carries the current asset version stamp', () => {
+  const stamper = require('../tools/stamp-assets.js');
+  const html = fs.readFileSync(stamper.PAGE, 'utf8');
+  assert.equal(html, stamper.stamp(html, stamper.computeVersion()),
+      'recorder/index.html asset stamps are stale. Run `npm run build`.');
+});
+
+test('every asset the recorder page loads is cache-busted', () => {
+  const stamper = require('../tools/stamp-assets.js');
+  const html = fs.readFileSync(stamper.PAGE, 'utf8');
+  const version = stamper.computeVersion();
+  stamper.ASSETS.forEach((asset) => {
+    if (asset === 'capture-worklet.js') {
+      // Loaded by recorder.js through addModule(), stamped from the meta tag.
+      const script = fs.readFileSync(path.join(ROOT, 'recorder', 'recorder.js'), 'utf8');
+      assert.ok(script.includes("addModule('capture-worklet.js' + assetVersion())"),
+          'the worklet URL should carry the asset version');
+      return;
+    }
+    assert.ok(html.includes(asset + '?v=' + version), asset + ' is not stamped');
+  });
+  assert.ok(html.includes('content="' + version + '"'), 'the meta tag should carry the version');
+});

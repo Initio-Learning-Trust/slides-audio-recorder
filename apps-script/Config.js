@@ -35,8 +35,14 @@ var MAX_RECORDING_BYTES = 100 * 1024 * 1024;
 /** How long a half-finished upload session stays resumable, in seconds. */
 var UPLOAD_SESSION_TTL_SECONDS = 6 * 60 * 60;
 
-/** Name of the Drive folder the add-on keeps its recordings in. */
-var ROOT_FOLDER_NAME = 'Slides Audio Recorder';
+/**
+ * Top-level Drive folder for recordings, with one subfolder per presentation.
+ *
+ * Changing this only affects users who have not recorded yet: the folder id is
+ * remembered per user, so an existing folder keeps the name it was created
+ * with rather than being renamed underneath someone.
+ */
+var ROOT_FOLDER_NAME = 'Slide Audio Recordings';
 
 /** Document Property key holding this presentation's recording index. */
 var PROP_RECORDINGS = 'recordings.v1';
@@ -69,17 +75,27 @@ function getRecorderTarget() {
 }
 
 /**
- * URL of an animation demonstrating Insert > Audio, shown in the done panel.
+ * The supplied Insert > Audio animation, if a deployment has one.
  *
- * Empty by default, in which case the sidebar draws the journey in CSS. Set the
- * HOWTO_ANIMATION_URL script property to a GIF, PNG or MP4 and the sidebar uses
- * that instead, with no code change.
+ * Empty by default, in which case the sidebar draws the journey in CSS. Set
+ * HOWTO_ANIMATION_URL to a GIF, PNG or MP4 and the sidebar shows that instead,
+ * with no code change. HOWTO_ANIMATION_POSTER is a still frame used for anyone
+ * who has asked their system for reduced motion; without one, those users keep
+ * the built-in diagram, which already has a static form.
  *
- * @return {string} The URL, or an empty string.
+ * See docs/design/ANIMATION_BRIEF.md for what the asset should contain.
+ *
+ * @return {{url: string, poster: string}} URLs, empty when not configured.
  */
-function getHowToAnimationUrl() {
-  var url = PropertiesService.getScriptProperties().getProperty('HOWTO_ANIMATION_URL') || '';
-  return url.indexOf('https://') === 0 ? url : '';
+function getHowToAnimation() {
+  var props = PropertiesService.getScriptProperties();
+  var https = function (value) {
+    return value && value.indexOf('https://') === 0 ? value : '';
+  };
+  return {
+    url: https(props.getProperty('HOWTO_ANIMATION_URL')),
+    poster: https(props.getProperty('HOWTO_ANIMATION_POSTER'))
+  };
 }
 
 /** Default preferences for a user who has never opened Settings. */

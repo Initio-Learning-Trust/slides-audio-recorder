@@ -126,7 +126,11 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     assert.equal(await recorder.isVisible('[data-panel="standalone"]'), false,
         'the recorder should not show the standalone notice when launched properly');
     assert.equal(await recorder.isVisible('#btn-record'), true);
-    assert.equal(await recorder.textContent('#context'), 'Slide 3 · Bonjour');
+    assert.equal(await recorder.isVisible('#status-row'), false,
+        'an idle window must not claim to be recording');
+    assert.equal(await recorder.isVisible('#scope'), false,
+        'the waveform belongs to the recording state, not to rest');
+    assert.equal(await recorder.textContent('#context'), 'Slide 3');
   });
 
   await t.test('the handshake completes', async () => {
@@ -138,6 +142,8 @@ test('the recorder captures audio and hands it to a page on another origin', asy
   await t.test('the live meter streams to the sidebar while recording', async () => {
     await recorder.click('#btn-record');
     await recorder.waitForSelector('#btn-record.is-recording', { timeout: 10000 });
+    assert.equal(await recorder.isVisible('#status-row'), true, 'now it really is recording');
+    assert.equal(await recorder.isVisible('#scope'), true);
     await sidebar.waitForFunction(() => window.__harness.sawRecordingState === true, null, { timeout: 5000 });
     await sidebar.waitForFunction(() => window.__harness.levelFrames > 3, null, { timeout: 5000 });
 

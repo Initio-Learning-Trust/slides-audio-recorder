@@ -29,6 +29,14 @@
 
 * { box-sizing: border-box; }
 
+/*
+ * The hidden attribute sets display:none through the UA stylesheet, which any
+ * author rule with its own display value silently overrides. Components here
+ * are flex, so state them together once rather than remembering per rule.
+ */
+[hidden] { display: none !important; }
+
+
 body {
   margin: 0;
   background: var(--surface);
@@ -61,7 +69,7 @@ footer a { color: var(--aqua-deep); }
 
 .panel h2 { font: 800 14px/1.35 'Manrope', sans-serif; margin: 0; }
 .lead { color: var(--body); margin: 0; }
-.note { font-size: 11px; color: var(--muted); margin: auto 0 0; text-align: center; }
+.note { font-size: 11px; color: var(--muted); margin: 0; text-align: center; }
 
 /* ---- status row ---- */
 .status { display: flex; align-items: center; gap: 8px; }
@@ -92,7 +100,10 @@ footer a { color: var(--aqua-deep); }
 @keyframes wv { 0%,100% { transform: scaleY(.2); } 50% { transform: scaleY(1); } }
 
 /* ---- record button ---- */
-.recWrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0; }
+.recWrap {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 8px 0; flex: 1;
+}
 .recStack { position: relative; width: 76px; height: 76px; }
 .recBtn {
   position: relative; z-index: 1; width: 76px; height: 76px; border: 0; border-radius: 50%;

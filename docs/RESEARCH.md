@@ -18,7 +18,7 @@ window on an origin we own, opened with `window.open()` from the sidebar. This i
 the community "microphone bridge" pattern.
 
 **Verifying it yourself.** The add-on ships a diagnostic for exactly this claim:
-*Extensions > Slides Audio Recorder > Diagnose microphone access*. It reports the frame chain,
+*Extensions > Audio Recorder > Diagnose microphone access*. It reports the frame chain,
 whether the permissions policy allows `microphone`, whether a nested iframe of ours that asks for it
 is granted it, and what `getUserMedia()` actually throws. The same restriction applies to an Apps
 Script **web app** served by `doGet`, not just to sidebars and dialogs: Google wraps all HtmlService
