@@ -1,3 +1,5 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /*
@@ -214,19 +216,44 @@ footer a { color: var(--aqua-deep); }
 }
 .note { font-size: 11px; color: var(--muted); margin: 0; }
 
+/* ---- loading ---- */
+.skeleton {
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--rule) 25%, #fafaf8 37%, var(--rule) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.skeleton.circle { width: 76px; height: 76px; border-radius: 50%; }
+@keyframes shimmer {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; background: var(--rule); }
+}
+
 /* ---- clip list ---- */
+/*
+ * Three hundred pixels will not hold a badge, a name, its details and three
+ * actions on one line, so the actions sit under the name rather than fighting
+ * it for room.
+ */
 .clip {
-  display: flex; align-items: center; gap: 10px; border: 1px solid var(--border);
-  border-radius: var(--r-btn); padding: 10px 12px; animation: panelIn .3s var(--ease) both;
+  display: grid; grid-template-columns: auto 1fr;
+  grid-template-areas: "badge meta" "badge acts";
+  gap: 4px 10px; align-items: center;
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 10px 12px; animation: panelIn .3s var(--ease) both;
 }
 .clip .n {
+  grid-area: badge; align-self: start;
   width: 26px; height: 26px; border-radius: 6px; background: var(--ink); color: #fff;
-  font: 800 10px/1 'Manrope', sans-serif; display: grid; place-items: center; flex: none;
+  font: 800 10px/1 'Manrope', sans-serif; display: grid; place-items: center;
 }
-.clip .meta { min-width: 0; flex: 1; }
+.clip .meta { grid-area: meta; min-width: 0; }
 .clip .meta b { display: block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .clip .meta span { font-size: 11px; color: var(--muted); }
-.clip .acts { display: flex; gap: 2px; flex: none; }
+.clip .acts { grid-area: acts; display: flex; gap: 4px; margin-left: -5px; }
 .clip .acts button, .clip .acts a {
   border: 0; background: none; padding: 3px 5px; border-radius: 5px; cursor: pointer;
   font: 700 11px/1 'Manrope', sans-serif; color: var(--aqua-deep); text-decoration: none;
