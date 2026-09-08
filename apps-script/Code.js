@@ -57,13 +57,14 @@ function showHelp() {
   var target = getRecorderTarget();
   var html = HtmlService.createHtmlOutput(
       '<div style="font:13px/1.5 Roboto,Arial,sans-serif;padding:4px 2px">' +
-      '<p><b>' + escapeHtml_(ADDON_NAME) + '</b> records straight into your slides.</p>' +
+      '<p><b>' + escapeHtml_(ADDON_NAME) + '</b> records narration for the slide you have open.</p>' +
       '<ol style="padding-left:18px;margin:8px 0">' +
       '<li>Open <i>Extensions &rsaquo; ' + escapeHtml_(ADDON_NAME) + ' &rsaquo; Record audio</i>.</li>' +
-      '<li>Press <b>Record</b>. A small recording window opens &mdash; allow microphone access once.</li>' +
-      '<li>Press <b>Use recording</b>. The audio is saved to your Drive and a play button is added to the current slide.</li>' +
+      '<li>Tap the record button. A small window opens for the microphone; allow it once.</li>' +
+      '<li>Tap it again to stop. Your take appears in the sidebar to listen back to.</li>' +
+      '<li>Name the button and press <b>Insert into current slide</b>.</li>' +
       '</ol>' +
-      '<p>Recording happens in a separate window because Google blocks microphone access inside add-on sidebars.</p>' +
+      '<p>Recording opens in a separate window because Google does not allow add-on panels to use the microphone.</p>' +
       '<p><a href="' + escapeHtml_(SUPPORT_URL) + '" target="_blank">Full user guide</a> &middot; ' +
       '<span style="color:#5f6368">Recorder: ' + escapeHtml_(target.origin) + '</span></p>' +
       '</div>')
@@ -105,7 +106,7 @@ function getBootstrap() {
   return {
     addonName: ADDON_NAME,
     version: ADDON_VERSION,
-    howtoAnimationUrl: getHowToAnimationUrl(),
+    howtoAnimation: getHowToAnimation(),
     recorderUrl: target.url,
     recorderOrigin: target.origin,
     supportUrl: SUPPORT_URL,
