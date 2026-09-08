@@ -5,9 +5,9 @@
   "description": "Google Workspace Marketplace add-on that records audio in the Google Slides sidebar and places it on a slide.",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "node tools/sync-protocol.js && node tools/sync-brand.js && node tools/stamp-assets.js",
+    "build": "node tools/sync-protocol.js && node tools/sync-brand.js && node tools/convert-howto.js && node tools/stamp-assets.js",
     "test": "node --test \"test/*.test.js\"",
-    "verify": "npm run build && git diff --exit-code -- apps-script/Protocol.html apps-script/Brand.html recorder/index.html && npm test && npm run test:e2e",
+    "verify": "npm run build && git diff --exit-code -- apps-script/Protocol.html apps-script/Brand.html apps-script/HowTo.html recorder/index.html && npm test && npm run test:e2e",
     "push": "clasp push",
     "open": "clasp open",
     "test:e2e": "node --test \"test/e2e/*.e2e.js\""

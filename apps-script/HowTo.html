@@ -1,0 +1,360 @@
+<!--
+  GENERATED FILE - do not edit.
+  Source: docs/design/how-to-insert.dc.html
+  Regenerate with: npm run build
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body { margin: 0; }
+  a { color: #2f8f86; }
+  a:hover { color: #24534f; }
+  @keyframes ripple { 0% { transform: scale(.2); opacity: .55; } 100% { transform: scale(1.9); opacity: 0; } }
+  @keyframes glowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+[data-when] { display: contents; }
+[data-when][hidden] { display: none !important; }
+[data-action] { user-select: none; }
+[data-action]:hover { background: #f4faf9 !important; border-color: #89ccca !important; }
+@media (prefers-reduced-motion: reduce) {
+  #ptr { transition: none !important; }
+  [style*="animation"] { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; }
+  a { color: #2f8f86; }
+  a:hover { color: #24534f; }
+  @keyframes ripple { 0% { transform: scale(.2); opacity: .55; } 100% { transform: scale(1.9); opacity: 0; } }
+  @keyframes glowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#f4f3ef;font-family:'Manrope',system-ui,sans-serif;color:#283e49;display:flex;flex-direction:column;align-items:center;gap:26px;padding:48px 24px 72px;box-sizing:border-box">
+
+  <div style="text-align:center;display:flex;flex-direction:column;gap:8px;max-width:640px">
+    <div style="font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#89ccca;font-weight:700">Initio Audio Recorder</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-0.02em">Adding your recording to a slide</div>
+  </div>
+
+  <div style="width:100%;max-width:960px;background:#ffffff;border:1px solid #e6e4dd;border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(40,62,73,0.14)">
+    <div id="stageWrap" style="position:relative;width:100%;aspect-ratio:960/560;background:#eef1f4;overflow:hidden">
+      <div id="scaleInner" style="position:absolute;left:0;top:0;width:960px;height:560px;transform-origin:top left">
+
+      <div data-when="showMenu">
+        <div style="position:absolute;inset:0;background:#ffffff">
+          <div style="display:flex;align-items:center;gap:12px;padding:11px 16px 0">
+            <div style="width:24px;height:24px;border-radius:4px;background:#f9ab00;flex:none"></div>
+            <div style="font-size:17px;font-weight:500;color:#3c4043">Test Audio</div>
+            <div style="display:flex;gap:12px;color:#5f6368;font-size:13px">☆ ▤ ☁</div>
+          </div>
+          <div style="display:flex;gap:4px;padding:6px 16px 8px;font-size:13px;color:#3c4043">
+            <span style="padding:3px 8px">File</span><span style="padding:3px 8px">Edit</span><span style="padding:3px 8px">View</span>
+            <span id="t-insert" style="padding:3px 8px;background:#e8eaed;border-radius:4px">Insert</span>
+            <span style="padding:3px 8px">Format</span><span style="padding:3px 8px">Slide</span><span style="padding:3px 8px">Arrange</span><span style="padding:3px 8px">Tools</span><span style="padding:3px 8px">Extensions</span><span style="padding:3px 8px">Help</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:6px 16px 10px">
+            <div style="height:30px;border-radius:15px;background:#f1f3f4;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13px;color:#5f6368">⌕ Menus</div>
+            <div style="display:flex;gap:16px;color:#5f6368;font-size:14px">＋ ▤ ⬒ ✎ ▦ ↺</div>
+          </div>
+          <div style="height:1px;background:#e8eaed"></div>
+          <div style="display:flex;height:100%">
+            <div style="width:120px;padding:14px 10px;display:flex;gap:8px">
+              <span style="font-size:11px;color:#5f6368">1</span>
+              <div style="flex:1;height:60px;border:2px solid #1a73e8;border-radius:4px;background:#fff"></div>
+            </div>
+            <div style="flex:1;background:#f8f9fa;padding:20px 40px"><div style="width:100%;max-width:420px;aspect-ratio:16/9;background:#fff;border:1px solid #dadce0;border-radius:3px;margin-left:180px"></div></div>
+          </div>
+          <div style="position:absolute;left:160px;top:96px;width:330px;background:#ffffff;border-radius:8px;box-shadow:0 8px 26px rgba(60,64,67,0.3);padding:8px 0;font-size:13px;color:#3c4043">
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">✎</span>Help me visualise</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">▣</span>Image<span style="margin-left:auto;color:#5f6368">▸</span></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">T</span>Text box</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">◯</span>Shape<span style="margin-left:auto;color:#5f6368">▸</span></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">⑃</span>Diagram</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">▦</span>Table<span style="margin-left:auto;color:#5f6368">▸</span></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">▥</span>Chart<span style="margin-left:auto;color:#5f6368">▸</span></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">╲</span>Line<span style="margin-left:auto;color:#5f6368">▸</span></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">A</span>Word art</div>
+            <div style="height:1px;background:#e8eaed;margin:4px 0"></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">▢</span>Speaker spotlight</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px"><span style="width:18px;color:#5f6368">▷</span>Video</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px;border-radius:4px" id="hi-audio"><span style="width:18px;color:#5f6368">◍</span>Audio</div>
+            <div style="height:1px;background:#e8eaed;margin:4px 0"></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px;color:#bdc1c6"><span style="width:18px">Ω</span>Special characters</div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px;color:#bdc1c6"><span style="width:18px">◔</span>Animation</div>
+            <div style="height:1px;background:#e8eaed;margin:4px 0"></div>
+            <div style="height:32px;display:flex;align-items:center;gap:14px;padding:0 16px;color:#5f6368"><span style="width:18px">⚭</span>Link<span style="margin-left:auto;font-size:12px">Ctrl+K</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div data-when="showDialog">
+        <div style="position:absolute;left:50px;top:36px;width:860px;height:470px;background:#ffffff;border-radius:10px;box-shadow:0 14px 40px rgba(60,64,67,0.26);display:flex;flex-direction:column;overflow:hidden">
+          <div style="height:62px;display:flex;align-items:center;gap:18px;padding:0 20px;flex:none">
+            <div style="display:flex;align-items:center;gap:10px;flex:none">
+              <div style="width:20px;height:18px;background:#2f8f86;clip-path:polygon(50% 0,100% 100%,0 100%)"></div>
+              <div style="font-size:17px;font-weight:500;color:#3c4043;white-space:nowrap">Insert audio</div>
+            </div>
+            <div style="flex:1;height:40px;border-radius:20px;background:#eef1f4;display:flex;align-items:center;gap:12px;padding:0 18px;font-size:13px;color:#80868b">⌕<span>Search in Drive or paste URL</span><span style="margin-left:auto">⇋</span></div>
+            <div style="font-size:17px;color:#5f6368;flex:none">✕</div>
+          </div>
+          <div style="height:44px;display:flex;gap:28px;padding:0 24px;font-size:13px;font-weight:500;flex:none;background:#eef1f4">
+            <span id="tab-drive" style="padding-top:14px">My Drive</span>
+            <span style="color:#5f6368;padding-top:14px">Shared drives</span>
+            <span style="color:#5f6368;padding-top:14px">Shared with me</span>
+            <span id="tab-recent" style="padding-top:14px">Recent</span>
+          </div>
+          <div style="height:44px;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:0 24px;background:#eef1f4;flex:none">
+            <div style="width:44px;height:28px;border-radius:14px 0 0 14px;background:#d3e3fd;color:#1a73e8;display:flex;align-items:center;justify-content:center;font-size:12px">▤</div>
+            <div style="width:44px;height:28px;border-radius:0 14px 14px 0;background:#e8eaed;color:#5f6368;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:-6px">▦</div>
+          </div>
+
+          <div data-when="tabDrive">
+            <div style="flex:1;padding:0 24px;overflow:hidden">
+              <div style="display:flex;height:36px;align-items:center;padding:0 14px;font-size:12px;font-weight:700;color:#3c4043"><span style="flex:1">Name ↑</span><span style="width:110px">Owner</span><span style="width:150px">Last modified</span><span style="width:90px">File size</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:20px;height:16px;border-radius:2px;background:#5f6368;flex:none"></span>ACE 2023</span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">15 Sept 2023</span><span style="width:90px;color:#5f6368">0 bytes</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:20px;height:16px;border-radius:2px;background:#5f6368;flex:none"></span>ACE videos final</span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">15 Sept 2023</span><span style="width:90px;color:#5f6368">—</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043;border-radius:4px" id="hi-folder"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:20px;height:16px;border-radius:2px;background:#2f8f86;flex:none"></span><b style="font-weight:700;color:#283e49">Slide Audio Recordings</b></span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">8 Sept 2026</span><span style="width:90px;color:#5f6368">—</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:20px;height:16px;border-radius:2px;background:#5f6368;flex:none"></span>AppBridge temp folder: 1c3cd694eb7b4b7b8943e8f3f1…</span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">9 Jun 2026</span><span style="width:90px;color:#5f6368">—</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:20px;height:16px;border-radius:2px;background:#5f6368;flex:none"></span>AppBridge temp folder: 2c7417e042a24f919c3301b8d4…</span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">6 Jun 2026</span><span style="width:90px;color:#5f6368">—</span></div>
+            </div>
+          </div>
+
+          <div data-when="tabFolder">
+            <div style="flex:1;padding:0 24px;overflow:hidden">
+              <div style="display:flex;height:36px;align-items:center;gap:8px;padding:0 14px;font-size:13px;color:#5f6368">My Drive <span>›</span><b style="color:#3c4043">Slide Audio Recordings</b></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043;border-radius:4px" id="hi-file"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:18px;height:18px;border-radius:3px;background:#e2574c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">♪</span>Slide 1 - Listen - 2026-09-08 12.05.20.wav <span style="color:#5f6368;font-size:11px">👥</span></span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">8 Sept 2026</span><span style="width:90px;color:#5f6368">1.2 MB</span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:18px;height:18px;border-radius:3px;background:#e2574c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">♪</span>Slide 1 - Test Recording - 2026-09-08 12.01.04.wav <span style="color:#5f6368;font-size:11px">👥</span></span><span style="width:110px;color:#5f6368">me</span><span style="width:150px;color:#5f6368">8 Sept 2026</span><span style="width:90px;color:#5f6368">860 KB</span></div>
+            </div>
+          </div>
+
+          <div data-when="tabRecent">
+            <div style="flex:1;padding:0 24px;overflow:hidden">
+              <div style="display:flex;height:36px;align-items:center;padding:0 14px;font-size:12px;font-weight:700;color:#3c4043"><span style="flex:1">Name</span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#5f6368">Today</div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043;border-radius:4px" id="hi-recentFile"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:18px;height:18px;border-radius:3px;background:#e2574c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">♪</span><b style="font-weight:700;color:#283e49">Slide 1 - Listen - 2026-09-08 12.05.20.wav</b> <span style="color:#5f6368;font-size:11px">👥</span></span><span style="width:110px;color:#5f6368"></span><span style="width:150px;color:#5f6368"></span><span style="width:90px;color:#5f6368"></span></div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:18px;height:18px;border-radius:3px;background:#e2574c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">♪</span>Slide 1 - Test Recording - 2026-09-08 12.01.04.wav <span style="color:#5f6368;font-size:11px">👥</span></span><span style="width:110px;color:#5f6368"></span><span style="width:150px;color:#5f6368"></span><span style="width:90px;color:#5f6368"></span></div>
+              <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#5f6368">Never</div>
+              <div style="height:44px;display:flex;align-items:center;padding:0 14px;border-top:1px solid #f1f3f4;font-size:13px;color:#3c4043"><span style="flex:1;display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden;white-space:nowrap"><span style="width:18px;height:18px;border-radius:3px;background:#e2574c;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">♪</span>Daisy Bell (performance track).mp3 <span style="color:#5f6368;font-size:11px">👥</span></span><span style="width:110px;color:#5f6368"></span><span style="width:150px;color:#5f6368"></span><span style="width:90px;color:#5f6368"></span></div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:14px 24px;border-top:1px solid #e8eaed;flex:none">
+            <div style="font-size:13px;font-weight:600;color:#1a73e8;padding:9px 16px">Cancel</div>
+            <div id="t-insertbtn" style="font-size:13px;font-weight:600;color:#ffffff;background:#1a73e8;border-radius:18px;padding:9px 24px">Insert</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-when="showDone">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#eef1f4">
+          <div style="width:620px;aspect-ratio:16/9;background:#ffffff;border:1px solid #dadce0;border-radius:3px;box-shadow:0 8px 26px rgba(60,64,67,0.2);position:relative;display:flex;flex-direction:column;justify-content:center;padding:48px;box-sizing:border-box;gap:16px">
+            <div style="font-size:30px;font-weight:700;color:#283e49">Click to listen</div>
+            <div style="width:60%;height:10px;border-radius:5px;background:#e8eaed"></div>
+            <div style="position:absolute;right:36px;bottom:34px;display:flex;align-items:center;gap:10px;animation:glowIn .5s cubic-bezier(.22,.61,.36,1) both">
+              <div style="width:52px;height:52px;border-radius:50%;background:#283e49;display:flex;align-items:center;justify-content:center;color:#ffce32;font-size:20px;font-weight:800;box-shadow:0 8px 20px rgba(40,62,73,0.3)">▶</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ptr" style="position:absolute;left:0;top:0;width:26px;height:26px;pointer-events:none;z-index:5;transition:transform 750ms cubic-bezier(.5,.05,.2,1)">
+        <div data-when="clicking">
+          <div style="position:absolute;left:-24px;top:-24px;width:48px;height:48px;border-radius:50%;background:#ffce32;animation:ripple 700ms ease-out both"></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="24" height="24" style="position:absolute;left:-3px;top:-1px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))"><path d="M4 2 L4 20 L9 15.2 L12.2 22 L15.4 20.4 L12.2 13.8 L19 13.8 Z" fill="#ffffff" stroke="#202124" stroke-width="1.4" stroke-linejoin="round"></path></svg>
+      </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:16px;padding:18px 22px;border-top:1px solid #e6e4dd;background:#ffffff">
+      <div style="width:28px;height:28px;border-radius:50%;background:#283e49;color:#ffce32;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none"><span data-text="stepNo"></span></div>
+      <div style="font-size:15px;font-weight:600;flex:1;text-wrap:pretty"><span data-text="caption"></span></div>
+      <div data-action="toggle" style="font-size:12px;font-weight:700;border:1px solid #dfe4e3;border-radius:7px;padding:8px 14px;cursor:pointer;background:#ffffff"><span data-text="playLabel"></span></div>
+      <div data-action="restart" style="font-size:12px;font-weight:700;border:1px solid #dfe4e3;border-radius:7px;padding:8px 14px;cursor:pointer;background:#ffffff">Replay</div>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:960px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#8b8a83">Route 1 · Recent</div>
+      <div style="font-size:14px;font-weight:500;color:#5c6a72;line-height:1.55">Insert → Audio → <b style="color:#283e49">Recent</b>. Your newest recording sits at the top under Today. Fastest route straight after recording.</div>
+    </div>
+    <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#8b8a83">Route 2 · My Drive</div>
+      <div style="font-size:14px;font-weight:500;color:#5c6a72;line-height:1.55">Insert → Audio → <b style="color:#283e49">My Drive</b> → <b style="color:#283e49">Slide Audio Recordings</b>. Use this for older takes, or type the folder name into the search box.</div>
+    </div>
+    <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:#8b8a83">Naming</div>
+      <div style="font-size:14px;font-weight:500;color:#5c6a72;line-height:1.55">Recordings are saved as <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px">Slide 1 - Listen - 2026-09-08 12.05.20.wav</span>, so slide number and time tell you which take is which.</div>
+    </div>
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var steps = [{ p: 'menu', t: 't-insert', cap: 'In the menu bar, click Insert', dur: 1900, click: true },
+    { p: 'menu', t: 'hi-audio', hi: 'audio', cap: 'Move down the menu and choose Audio', dur: 2400, click: true },
+    { p: 'dialog', tab: 'recent', t: 'tab-recent', cap: 'The Insert audio window opens. Quickest route: the Recent tab', dur: 2300, click: true },
+    { p: 'dialog', tab: 'recent', t: 'hi-recentFile', hi: 'recentFile', cap: 'Under Today, select the recording you just made', dur: 2400, click: true },
+    { p: 'dialog', tab: 'recent', t: 't-insertbtn', hi: 'recentFile', cap: 'Click Insert', dur: 1900, click: true },
+    { p: 'dialog', tab: 'drive', t: 'tab-drive', cap: 'For an older take, open My Drive instead', dur: 2300, click: true },
+    { p: 'dialog', tab: 'drive', t: 'hi-folder', hi: 'folder', cap: 'Open the folder Slide Audio Recordings', dur: 2400, click: true },
+    { p: 'dialog', tab: 'folder', t: 'hi-file', hi: 'file', cap: 'Select the recording you want', dur: 2300, click: true },
+    { p: 'dialog', tab: 'folder', t: 't-insertbtn', hi: 'file', cap: 'Click Insert', dur: 1900, click: true },
+    { p: 'done', cap: 'The audio lands on the slide as a speaker icon you can move and resize', dur: 3000 }];
+
+  var state = { i: 0, playing: true, clicking: false };
+  var stepTimer = null;
+  var clickTimer = null;
+
+  /**
+   * @param {string} name Binding name.
+   * @return {!Array<!Element>} Elements bound to it.
+   */
+  function bound(name) {
+    return Array.prototype.slice.call(document.querySelectorAll('[data-when="' + name + '"]'));
+  }
+
+  /**
+   * @param {string} name Binding name.
+   * @param {string} value Text to show.
+   */
+  function setText(name, value) {
+    document.querySelectorAll('[data-text="' + name + '"]').forEach(function (node) {
+      node.textContent = value;
+    });
+  }
+
+  /** Shows the regions this step needs and hides the rest. */
+  function render() {
+    var s = steps[state.i];
+    var flags = {
+      showMenu: s.p === 'menu',
+      showDialog: s.p === 'dialog',
+      showDone: s.p === 'done',
+      tabDrive: s.tab === 'drive',
+      tabFolder: s.tab === 'folder',
+      tabRecent: s.tab === 'recent',
+      clicking: state.clicking
+    };
+    Object.keys(flags).forEach(function (name) {
+      bound(name).forEach(function (node) {
+        node.hidden = !flags[name];
+      });
+    });
+    setText('caption', s.cap);
+    setText('stepNo', String(state.i + 1));
+    setText('playLabel', state.playing ? 'Pause' : 'Play');
+    paint();
+  }
+
+  /** Positions the pointer and highlights, as the artboard did. */
+  function paint() {
+    var wrap = document.getElementById('stageWrap');
+    var inner = document.getElementById('scaleInner');
+    if (!wrap || !inner) {
+      return;
+    }
+    var scale = (wrap.clientWidth || 960) / 960;
+    inner.style.transform = 'scale(' + scale + ')';
+
+    var s = steps[state.i];
+    ['audio', 'folder', 'file', 'recentFile'].forEach(function (key) {
+      var node = document.getElementById('hi-' + key);
+      if (!node) {
+        return;
+      }
+      var on = s.hi === key;
+      node.style.background = on ? '#e8f0fe' : 'transparent';
+      node.style.boxShadow = on ? 'inset 0 0 0 2px #ffce32' : 'none';
+    });
+
+    var driveTab = document.getElementById('tab-drive');
+    var recentTab = document.getElementById('tab-recent');
+    var recent = s.tab === 'recent';
+    if (driveTab) {
+      driveTab.style.color = recent ? '#5f6368' : '#1a73e8';
+      driveTab.style.borderBottom = '3px solid ' + (recent ? 'transparent' : '#1a73e8');
+    }
+    if (recentTab) {
+      recentTab.style.color = recent ? '#1a73e8' : '#5f6368';
+      recentTab.style.borderBottom = '3px solid ' + (recent ? '#1a73e8' : 'transparent');
+    }
+
+    var pointer = document.getElementById('ptr');
+    var target = s.t ? document.getElementById(s.t) : null;
+    if (pointer && target) {
+      var innerRect = inner.getBoundingClientRect();
+      var targetRect = target.getBoundingClientRect();
+      var x = (targetRect.left - innerRect.left) / scale +
+          Math.min(46, (targetRect.width / scale) / 2);
+      var y = (targetRect.top - innerRect.top) / scale + (targetRect.height / scale) / 2;
+      pointer.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    } else if (pointer && s.p === 'done') {
+      pointer.style.transform = 'translate3d(700px,400px,0)';
+    }
+  }
+
+  /** Schedules the click ripple and the move to the next step. */
+  function queue() {
+    clearTimeout(stepTimer);
+    clearTimeout(clickTimer);
+    if (!state.playing) {
+      return;
+    }
+    var s = steps[state.i];
+    if (s.click) {
+      clickTimer = setTimeout(function () {
+        state.clicking = true;
+        render();
+        setTimeout(function () {
+          state.clicking = false;
+          render();
+        }, 700);
+      }, 780);
+    }
+    stepTimer = setTimeout(function () {
+      state.i = (state.i + 1) % steps.length;
+      render();
+      queue();
+    }, s.dur);
+  }
+
+  document.addEventListener('click', function (event) {
+    var action = event.target.closest('[data-action]');
+    if (!action) {
+      return;
+    }
+    if (action.dataset.action === 'toggle') {
+      state.playing = !state.playing;
+    } else if (action.dataset.action === 'restart') {
+      state.i = 0;
+      state.playing = true;
+    }
+    render();
+    queue();
+  });
+
+  window.addEventListener('resize', paint);
+  if (window.ResizeObserver) {
+    var wrap = document.getElementById('stageWrap');
+    if (wrap) {
+      new ResizeObserver(paint).observe(wrap);
+    }
+  }
+
+  render();
+  queue();
+}());
+</script>
+</body>
+</html>

@@ -6,11 +6,11 @@
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
 <!-- Stamped by tools/stamp-assets.js; see that file for why. -->
-<meta name="asset-version" content="8602cab0">
+<meta name="asset-version" content="51f02453">
 <title>Record audio for Google Slides</title>
 <link rel="icon" href="../assets/app-icon-64.png">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="recorder.css?v=8602cab0">
+<link rel="stylesheet" href="recorder.css?v=51f02453">
 </head>
 <body>
 <div class="app">
@@ -51,6 +51,31 @@
       <div class="err" id="error" role="alert" hidden></div>
       <p class="note" id="note">Your browser will ask for the microphone.</p>
     </section>
+
+    <section class="panel" data-panel="review">
+      <div class="stack tight">
+        <div class="label">Review</div>
+        <div class="card">
+          <div class="playRow">
+            <button class="play" id="btn-play" aria-label="Play">&#9654;</button>
+            <div class="bars" id="bars"></div>
+            <span class="time" id="dur">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Name this recording</span>
+        <input type="text" id="name" maxlength="60" placeholder="Listen" autocomplete="off">
+      </label>
+
+      <div class="err" id="review-error" role="alert" hidden></div>
+
+      <div class="foot-actions">
+        <button class="ghost" id="btn-again">Re-record</button>
+        <button class="primary" id="btn-done">Done</button>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -59,8 +84,8 @@
   </footer>
 </div>
 
-<script src="lib/protocol.js?v=8602cab0"></script>
-<script src="lib/wav.js?v=8602cab0"></script>
-<script src="recorder.js?v=8602cab0"></script>
+<script src="lib/protocol.js?v=51f02453"></script>
+<script src="lib/wav.js?v=51f02453"></script>
+<script src="recorder.js?v=51f02453"></script>
 </body>
 </html>

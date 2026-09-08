@@ -6,8 +6,6 @@
 /** Sample rates we accept from the client, in Hz. */
 var ALLOWED_SAMPLE_RATES = [16000, 22050, 44100];
 var ALLOWED_SHARING = ['domain', 'anyone', 'private'];
-var ALLOWED_CHIP_STYLES = ['chip', 'dot', 'text'];
-var ALLOWED_CHIP_POSITIONS = ['bottom-left', 'bottom-right', 'top-left', 'top-right', 'centre'];
 
 /**
  * @return {Object} The current user's settings, with defaults filled in.
@@ -47,17 +45,9 @@ function saveSettings(incoming) {
 function sanitiseSettings_(s) {
   var d = defaultSettings();
   s = s || {};
-  var label = String(s.chipLabel == null ? d.chipLabel : s.chipLabel).trim();
-  if (!label) {
-    label = d.chipLabel;
-  }
   return {
     sampleRate: ALLOWED_SAMPLE_RATES.indexOf(Number(s.sampleRate)) >= 0 ? Number(s.sampleRate) : d.sampleRate,
     sharing: ALLOWED_SHARING.indexOf(s.sharing) >= 0 ? s.sharing : d.sharing,
-    chipStyle: ALLOWED_CHIP_STYLES.indexOf(s.chipStyle) >= 0 ? s.chipStyle : d.chipStyle,
-    chipLabel: label.slice(0, 60),
-    chipPosition: ALLOWED_CHIP_POSITIONS.indexOf(s.chipPosition) >= 0 ? s.chipPosition : d.chipPosition,
-    addToSpeakerNotes: s.addToSpeakerNotes === true,
-    autoInsert: s.autoInsert !== false
+    addToSpeakerNotes: s.addToSpeakerNotes === true
   };
 }

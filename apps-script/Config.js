@@ -74,39 +74,11 @@ function getRecorderTarget() {
   return { origin: origin, url: origin + path };
 }
 
-/**
- * The supplied Insert > Audio animation, if a deployment has one.
- *
- * Empty by default, in which case the sidebar draws the journey in CSS. Set
- * HOWTO_ANIMATION_URL to a GIF, PNG or MP4 and the sidebar shows that instead,
- * with no code change. HOWTO_ANIMATION_POSTER is a still frame used for anyone
- * who has asked their system for reduced motion; without one, those users keep
- * the built-in diagram, which already has a static form.
- *
- * See docs/design/ANIMATION_BRIEF.md for what the asset should contain.
- *
- * @return {{url: string, poster: string}} URLs, empty when not configured.
- */
-function getHowToAnimation() {
-  var props = PropertiesService.getScriptProperties();
-  var https = function (value) {
-    return value && value.indexOf('https://') === 0 ? value : '';
-  };
-  return {
-    url: https(props.getProperty('HOWTO_ANIMATION_URL')),
-    poster: https(props.getProperty('HOWTO_ANIMATION_POSTER'))
-  };
-}
-
 /** Default preferences for a user who has never opened Settings. */
 function defaultSettings() {
   return {
-    sampleRate: 22050,          // 16000 | 22050 | 44100
-    sharing: 'domain',          // 'domain' | 'anyone' | 'private'
-    chipStyle: 'chip',          // 'chip' | 'dot' | 'text'
-    chipLabel: 'Listen',
-    chipPosition: 'bottom-left',// 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'centre'
-    addToSpeakerNotes: false,
-    autoInsert: true
+    sampleRate: 22050,   // 16000 | 22050 | 44100
+    sharing: 'domain',   // 'domain' | 'anyone' | 'private'
+    addToSpeakerNotes: false
   };
 }

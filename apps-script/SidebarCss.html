@@ -247,89 +247,12 @@ footer a { color: var(--aqua-deep); }
 }
 .filename button { flex: none; padding: 8px 10px; }
 
-/*
- * The demo below is a placeholder that draws the Insert > Audio journey in CSS.
- * Set the HOWTO_ANIMATION_URL script property to a GIF, PNG or MP4 and the
- * sidebar shows that instead, with no code change.
- */
-.demo {
-  position: relative; aspect-ratio: 2 / 1; min-height: 120px; border-radius: 8px;
-  overflow: hidden; background: #fff; border: 1px solid var(--rule); margin-bottom: 10px;
-}
-.demo img, .demo video { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.d-bar {
-  display: flex; gap: 9px; padding: 6px 8px; border-bottom: 1px solid var(--rule);
-  font: 600 8px/1 'Manrope', sans-serif; color: var(--muted);
-}
-.d-bar span { padding: 2px 3px; border-radius: 3px; }
-.d-bar .d-insert { animation: dHi 8s var(--ease) infinite; }
-@keyframes dHi { 0%,12% { background: none; color: var(--muted); } 16%,34% { background: var(--aqua-tint); color: var(--ink); } 38%,100% { background: none; color: var(--muted); } }
-
-.d-menu {
-  position: absolute; left: 44px; top: 22px; width: 78px; padding: 4px;
-  background: #fff; border: 1px solid var(--border); border-radius: 5px;
-  box-shadow: 0 4px 10px rgba(40,62,73,.12); opacity: 0; transform: translateY(-4px);
-  animation: dMenu 8s var(--ease) infinite;
-}
-.d-menu span { display: block; padding: 3px 5px; border-radius: 3px; font: 600 8px/1.3 'Manrope', sans-serif; color: var(--body); }
-.d-menu .d-audio { animation: dHi2 8s var(--ease) infinite; }
-@keyframes dMenu {
-  0%,14% { opacity: 0; transform: translateY(-4px); }
-  18%,42% { opacity: 1; transform: none; }
-  46%,100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes dHi2 { 0%,28% { background: none; color: var(--body); } 32%,42% { background: var(--ink); color: #fff; } 46%,100% { background: none; color: var(--body); } }
-
-.d-picker {
-  position: absolute; left: 12px; right: 12px; top: 34px; padding: 7px;
-  background: #fff; border: 1px solid var(--border); border-radius: 6px;
-  box-shadow: 0 6px 16px rgba(40,62,73,.14); opacity: 0; transform: scale(.96);
-  animation: dPick 8s var(--ease) infinite;
-}
-@keyframes dPick {
-  0%,46% { opacity: 0; transform: scale(.96); }
-  52%,92% { opacity: 1; transform: none; }
-  96%,100% { opacity: 0; transform: scale(.96); }
-}
-.d-search { font: 600 8px/1 'Manrope', sans-serif; color: var(--muted); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 5px; margin-bottom: 5px; }
-.d-row {
-  display: flex; align-items: center; gap: 5px; padding: 4px 5px; border-radius: 4px;
-  font: 600 8px/1 'Manrope', sans-serif; color: var(--ink);
-  animation: dRow 8s var(--ease) infinite;
-}
-.d-row .d-wav { width: 12px; height: 12px; border-radius: 3px; background: var(--aqua-tint); color: var(--aqua-deep); display: grid; place-items: center; font-size: 6px; flex: none; }
-@keyframes dRow { 0%,60% { background: none; } 66%,92% { background: var(--aqua-tint); } 96%,100% { background: none; } }
-.d-cta { margin-top: 6px; text-align: right; }
-.d-cta b { display: inline-block; background: var(--ink); color: #fff; border-radius: 4px; padding: 3px 8px; font: 700 8px/1 'Manrope', sans-serif; }
-
-.d-cursor {
-  position: absolute; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--ink); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3);
-  left: 52px; top: 12px; animation: dCur 8s var(--ease) infinite;
-}
-@keyframes dCur {
-  0%   { left: 20px; top: 100px; opacity: 0; }
-  8%   { opacity: 1; }
-  16%  { left: 52px; top: 12px; }
-  30%  { left: 52px; top: 12px; }
-  40%  { left: 62px; top: 52px; }
-  58%  { left: 62px; top: 52px; }
-  70%  { left: 40px; top: 62px; }
-  88%  { left: 128px; top: 92px; }
-  96%,100% { left: 128px; top: 92px; opacity: 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
   }
-  /* With motion off the demo would freeze mid-journey, so show its end state. */
-  .d-menu, .d-cursor { display: none; }
-  .d-picker { opacity: 1; transform: none; }
-  .d-row { background: var(--aqua-tint); }
 }
 
 .sr-only {
