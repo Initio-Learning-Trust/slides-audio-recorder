@@ -6,71 +6,57 @@
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
 <title>Record audio for Google Slides</title>
-<link rel="icon" href="../icon.png">
+<link rel="icon" href="../assets/app-icon-64.png">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="recorder.css">
 </head>
 <body>
-<main class="shell" role="main">
-  <header class="head">
-    <h1>Record audio</h1>
-    <p class="sub" id="context">for the slide you have open</p>
+<div class="app">
+  <header>
+    <img class="mark" src="../assets/app-icon-64.png" alt="" width="22" height="22">
+    <h1>Audio Recorder</h1>
+    <span class="where" id="context"></span>
   </header>
 
-  <section class="panel" id="panel-standalone" hidden>
-    <h2>Open this from Google Slides</h2>
-    <p>This window is the microphone for the <strong>Slides Audio Recorder</strong> add-on. It has
-      nothing to record into on its own.</p>
-    <p>In your presentation choose <em>Extensions &rsaquo; Slides Audio Recorder &rsaquo; Record audio</em>,
-      then press <strong>Record</strong> in the sidebar.</p>
-  </section>
+  <main>
+    <!-- Shown when the page is opened without a sidebar to talk to. -->
+    <section class="panel" data-panel="standalone">
+      <h2>Open this from Google Slides</h2>
+      <p class="lead">This window is the microphone for the <strong>Audio Recorder</strong> add-on.
+        It has nothing to record into on its own.</p>
+      <p class="lead">In your presentation choose <strong>Extensions &rsaquo; Audio Recorder &rsaquo;
+        Record audio</strong>, then tap the record button in the sidebar.</p>
+    </section>
 
-  <section class="panel" id="panel-record">
-    <div class="visual">
-      <canvas id="wave" width="640" height="120" aria-hidden="true"></canvas>
-      <div class="meter" aria-hidden="true"><span id="meter-fill"></span></div>
-    </div>
-
-    <p class="timer" id="timer">0:00</p>
-    <p class="status" id="status" role="status" aria-live="polite">Ready when you are.</p>
-
-    <div class="controls">
-      <button type="button" id="btn-record" class="primary big">
-        <span class="dot" aria-hidden="true"></span> Record
-      </button>
-      <button type="button" id="btn-stop" class="primary big danger" hidden>
-        <span class="square" aria-hidden="true"></span> Stop
-      </button>
-    </div>
-
-    <div id="review" hidden>
-      <audio id="preview" controls preload="metadata"></audio>
-      <label class="field">
-        <span>Name this recording</span>
-        <input type="text" id="label" maxlength="60" placeholder="e.g. Bonjour, je m'appelle...">
-      </label>
-      <div class="controls">
-        <button type="button" id="btn-use" class="primary">Use recording</button>
-        <button type="button" id="btn-again" class="ghost">Record again</button>
+    <section class="panel" data-panel="record" data-active>
+      <div class="status" id="status-row" hidden>
+        <span class="dot"></span><span class="name">Recording</span>
+        <span class="time" id="clock">0:00</span>
       </div>
-      <p class="hint" id="size-hint"></p>
-    </div>
 
-    <div id="sent" hidden>
-      <p class="ok">Saved to your Drive and added to the sidebar.</p>
-      <div class="controls">
-        <button type="button" id="btn-another" class="primary">Record another</button>
-        <button type="button" id="btn-close" class="ghost">Close window</button>
+      <div class="scope is-idle" id="scope"></div>
+
+      <div class="recWrap">
+        <div class="recStack" id="stack">
+          <span class="ring"></span><span class="ring"></span>
+          <button class="recBtn" id="btn-record" aria-label="Start recording">
+            <span class="glyph"></span>
+          </button>
+        </div>
+        <div class="hint" id="hint">Tap to record</div>
       </div>
-    </div>
 
-    <p class="error" id="error" role="alert" hidden></p>
-  </section>
+      <div class="err" id="error" role="alert" hidden></div>
+      <p class="note" id="note">Your voice is encoded here and handed straight to the sidebar. It is
+        never sent to any other server.</p>
+    </section>
+  </main>
 
-  <footer class="foot">
-    <p>Audio is encoded in this window and handed straight to the add-on. It is never sent to any
-      other server. <a href="../privacy.html" target="_blank" rel="noopener">Privacy</a></p>
+  <footer>
+    <span>Initio Audio Recorder</span>
+    <a href="../privacy.html" target="_blank" rel="noopener">Privacy</a>
   </footer>
-</main>
+</div>
 
 <script src="lib/protocol.js"></script>
 <script src="lib/wav.js"></script>

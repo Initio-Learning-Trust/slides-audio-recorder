@@ -12,8 +12,8 @@ Google Slides sidebar  ──►  recording window  ──►  Drive (WAV)  ─�
 
 ## What it does
 
-- **Record from the sidebar.** One button opens a recording window with a level meter, live
-  waveform, timer and playback preview. Re-record until you are happy with it.
+- **Record from the sidebar.** One button opens a small recording window; the sidebar shows the
+  live waveform and timer, and you review and name the take there. Re-record until you are happy.
 - **Save to Drive automatically.** Recordings go into `Slides Audio Recorder / <presentation name>`
   as 16-bit WAV, named by slide number so they are easy to find later.
 - **Insert with one click.** A play control (blue button, small round button, or plain hyperlinked
@@ -47,17 +47,18 @@ Both are Google platform limits, not choices. [docs/RESEARCH.md](docs/RESEARCH.m
 | `apps-script/` | The add-on itself. `clasp` root — this is what gets pushed to Apps Script. |
 | `recorder/` | The static recording window, deployed to GitHub Pages. |
 | `site/` | Landing page, privacy policy and terms, published alongside the recorder. |
-| `tools/` | Build helpers: protocol sync, Marketplace icon generation. |
+| `tools/` | Build helpers: protocol sync, brand-icon inlining. |
 | `test/` | Node unit tests, plus a Playwright end-to-end test of the recording bridge. |
 | `docs/` | Architecture, deployment runbook, listing copy, security and research notes. |
-| `assets/` | Generated Marketplace icons and card banner. |
+| `assets/` | Marketplace icons and card banner from Initio's design handoff. |
+| `docs/design/` | The design handoff this UI is built to, kept for reference. |
 
 ## Quick start
 
 ```bash
 npm install
-npm test                 # 44 unit tests
-npm run test:e2e         # 8 browser assertions: real mic capture across two origins
+npm test                 # 54 unit tests
+npm run test:e2e         # 9 browser assertions: real mic capture across two origins
 npm run build            # regenerate apps-script/Protocol.html from the shared source
 
 npx clasp login
@@ -78,6 +79,7 @@ project and configure the Marketplace SDK.
 - [Security model](docs/SECURITY.md) — trust boundaries and threat model
 - [Test plan](docs/TESTING.md) — automated coverage and the manual pass before a release
 - [Research notes](docs/RESEARCH.md) — the platform limits, with sources
+- [Design handoff](docs/design/HANDOFF.md) — the tokens, state machine and animation spec the UI is built to
 - [Roadmap](docs/ROADMAP.md) — inline playback, MP3, transcripts
 
 ## Licence

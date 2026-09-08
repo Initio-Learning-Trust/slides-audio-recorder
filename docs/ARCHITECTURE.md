@@ -57,9 +57,16 @@ fails if the generated copy is stale.
 | 1 | sidebar → window | launch URL | carries the sidebar's origin, a fresh nonce, sample rate, size cap |
 | 2 | window → sidebar | `ready` | posted to `window.opener` at the origin from the URL |
 | 3 | sidebar → window | `ack` | sidebar confirms it is listening |
-| 4 | window → sidebar | `state` | recording started (drives the sidebar status line) |
-| 5 | window → sidebar | `audio` | the WAV as an `ArrayBuffer`, plus duration, sample rate, label |
-| 6 | sidebar → window | `accepted` / `rejected` | on failure the window keeps the audio so it can be resent |
+| 4 | window → sidebar | `state` | recording started; moves the sidebar to its recording panel |
+| 5 | window → sidebar | `levels` | twelve meter values, ~12 a second, so both windows show the same waveform |
+| 6 | sidebar → window | `stop` | the sidebar's stop button, so either window can end the take |
+| 7 | window → sidebar | `audio` | the WAV as an `ArrayBuffer`, plus duration and sample rate |
+| 8 | sidebar → window | `accepted` / `rejected` | on success the window closes itself; on failure it keeps the take |
+
+**Who does what.** The window is a microphone and a stop button. Reviewing, naming, choosing a
+style and inserting all happen in the sidebar, which is where the teacher is already looking — so
+there is one review surface, not two, and the window can close as soon as the audio is handed
+over.
 
 Both ends run every inbound message through `SarProtocol.accept()`, which checks the origin, the
 envelope marker, the protocol version, the nonce and the message type. The nonce is generated per

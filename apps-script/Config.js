@@ -7,7 +7,10 @@
  */
 
 /** Add-on name shown in menus and the sidebar header. */
-var ADDON_NAME = 'Slides Audio Recorder';
+var ADDON_NAME = 'Audio Recorder';
+
+/** Shown in the sidebar footer. */
+var ADDON_VERSION = '1.0';
 
 /**
  * Default origin serving the recorder bridge page. Must be an https origin you
@@ -63,6 +66,20 @@ function getRecorderTarget() {
     path = '/' + path;
   }
   return { origin: origin, url: origin + path };
+}
+
+/**
+ * URL of an animation demonstrating Insert > Audio, shown in the done panel.
+ *
+ * Empty by default, in which case the sidebar draws the journey in CSS. Set the
+ * HOWTO_ANIMATION_URL script property to a GIF, PNG or MP4 and the sidebar uses
+ * that instead, with no code change.
+ *
+ * @return {string} The URL, or an empty string.
+ */
+function getHowToAnimationUrl() {
+  var url = PropertiesService.getScriptProperties().getProperty('HOWTO_ANIMATION_URL') || '';
+  return url.indexOf('https://') === 0 ? url : '';
 }
 
 /** Default preferences for a user who has never opened Settings. */

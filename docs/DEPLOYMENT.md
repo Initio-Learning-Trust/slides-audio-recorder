@@ -93,6 +93,11 @@ In the Apps Script editor: **Project Settings ▸ Script Properties ▸ Add scri
 | --- | --- |
 | `RECORDER_ORIGIN` | `https://slides-audio.initiolearning.org` |
 | `RECORDER_PATH` | `/recorder/` |
+| `HOWTO_ANIMATION_URL` | `https://slides-audio.initiolearning.org/how-to-insert.gif` |
+
+`HOWTO_ANIMATION_URL` is optional. The sidebar's "play inside the slide" panel draws the
+Insert ▸ Audio journey in CSS by default; set this to an https GIF, PNG or MP4 and it shows that
+instead, with no code change. Anything roughly 3:2 and at least 560 px wide will look right.
 
 Script Properties override `DEFAULT_RECORDER_ORIGIN` / `DEFAULT_RECORDER_PATH` in `Config.js`, so a
 deployment can be re-pointed without a code change. The origin must be https; the add-on refuses

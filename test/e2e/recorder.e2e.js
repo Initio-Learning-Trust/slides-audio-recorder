@@ -123,11 +123,10 @@ test('the recorder captures audio and hands it to a page on another origin', asy
   await recorder.waitForLoadState();
 
   await t.test('the recorder recognises a legitimate launch', async () => {
-    assert.equal(await recorder.isVisible('#panel-standalone'), false,
+    assert.equal(await recorder.isVisible('[data-panel="standalone"]'), false,
         'the recorder should not show the standalone notice when launched properly');
     assert.equal(await recorder.isVisible('#btn-record'), true);
-    assert.equal(await recorder.textContent('#context'), 'for slide 3');
-    assert.equal(await recorder.inputValue('#label'), 'Bonjour');
+    assert.equal(await recorder.textContent('#context'), 'Slide 3 · Bonjour');
   });
 
   await t.test('the handshake completes', async () => {
@@ -136,18 +135,26 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     assert.ok(events.includes('accepted ready'), 'sidebar should accept the ready message');
   });
 
-  await t.test('recording produces audible WAV audio', async () => {
+  await t.test('the live meter streams to the sidebar while recording', async () => {
     await recorder.click('#btn-record');
-    await recorder.waitForSelector('#btn-stop:not([hidden])', { timeout: 10000 });
-    await recorder.waitForTimeout(1500);
-    await recorder.click('#btn-stop');
-    await recorder.waitForSelector('#review:not([hidden])', { timeout: 10000 });
+    await recorder.waitForSelector('#btn-record.is-recording', { timeout: 10000 });
+    await sidebar.waitForFunction(() => window.__harness.sawRecordingState === true, null, { timeout: 5000 });
+    await sidebar.waitForFunction(() => window.__harness.levelFrames > 3, null, { timeout: 5000 });
 
-    const hint = await recorder.textContent('#size-hint');
-    assert.match(hint, /\d+:\d\d/, 'the review panel should show a duration');
+    const levels = await sidebar.evaluate(() => window.__harness.lastLevels);
+    assert.equal(levels.length, 12, 'one value per bar in the sidebar scope');
+    levels.forEach((value) => {
+      assert.ok(value >= 0 && value <= 1, 'meter values are normalised, got ' + value);
+    });
 
-    await recorder.fill('#label', 'Bonjour tout le monde');
-    await recorder.click('#btn-use');
+    // The fake device beeps intermittently, so wait for a tone rather than
+    // sampling one frame and hoping it is not a gap between beeps.
+    await sidebar.waitForFunction(() => window.__harness.maxLevel > 0.2, null, { timeout: 8000 });
+  });
+
+  await t.test('stopping hands audible WAV audio to the sidebar', async () => {
+    await recorder.waitForTimeout(1000);
+    await recorder.click('#btn-record');
 
     await sidebar.waitForFunction(() => window.__harness.audio !== null, null, { timeout: 10000 });
     const audio = await sidebar.evaluate(() => window.__harness.audio);
@@ -155,7 +162,6 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     assert.equal(audio.header, 'RIFFWAVE', 'the payload should be a WAV file');
     assert.equal(audio.mimeType, 'audio/wav');
     assert.equal(audio.sampleRate, 22050, 'the requested sample rate should be honoured');
-    assert.equal(audio.label, 'Bonjour tout le monde');
     assert.ok(audio.durationMs > 800, 'expected at least ~1s of audio, got ' + audio.durationMs + 'ms');
     assert.ok(audio.byteLength > 44, 'the file should contain samples, not just a header');
     // The reported duration is rounded to whole milliseconds, so compare the
@@ -167,9 +173,10 @@ test('the recorder captures audio and hands it to a page on another origin', asy
         'expected the fake microphone tone to be audible, peak was ' + audio.peak);
   });
 
-  await t.test('the recorder confirms the save', async () => {
-    await recorder.waitForSelector('#sent:not([hidden])', { timeout: 5000 });
-    assert.equal(await recorder.isVisible('#review'), false);
+  await t.test('the recorder closes itself once the sidebar has the audio', async () => {
+    // The sidebar owns review and insertion from here, so the window is done.
+    await recorder.waitForEvent('close', { timeout: 5000 });
+    assert.equal(recorder.isClosed(), true);
   });
 
   await t.test('nothing threw along the way', () => {
@@ -187,9 +194,9 @@ test('the recorder refuses to run without a sidebar', async (t) => {
 
   const page = await browser.newPage();
   await page.goto(recorderServer.url + '/index.html');
-  assert.equal(await page.isVisible('#panel-standalone'), true,
+  assert.equal(await page.isVisible('[data-panel="standalone"]'), true,
       'opened directly, the recorder should explain it must be started from Slides');
-  assert.equal(await page.isVisible('#panel-record'), false);
+  assert.equal(await page.isVisible('[data-panel="record"]'), false);
 });
 
 test('the recorder ignores a launch URL naming an untrusted origin', async (t) => {
@@ -203,6 +210,6 @@ test('the recorder ignores a launch URL naming an untrusted origin', async (t) =
   const page = await browser.newPage();
   await page.goto(recorderServer.url +
       '/index.html?o=' + encodeURIComponent('http://evil.example') + '&n=abc');
-  assert.equal(await page.isVisible('#panel-standalone'), true,
+  assert.equal(await page.isVisible('[data-panel="standalone"]'), true,
       'a non-loopback http origin must be rejected before any recording is possible');
 });

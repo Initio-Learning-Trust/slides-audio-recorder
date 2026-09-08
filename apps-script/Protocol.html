@@ -34,7 +34,9 @@
   var TYPES = {
     READY: 'ready',        // recorder -> sidebar: window is up
     ACK: 'ack',            // sidebar -> recorder: I am listening
-    STATE: 'state',        // recorder -> sidebar: idle/recording/review
+    STATE: 'state',        // recorder -> sidebar: idle/recording/stopped
+    LEVELS: 'levels',      // recorder -> sidebar: live meter values, ~12/second
+    STOP: 'stop',          // sidebar -> recorder: stop recording now
     AUDIO: 'audio',        // recorder -> sidebar: here is the WAV
     ACCEPTED: 'accepted',  // sidebar -> recorder: saved successfully
     REJECTED: 'rejected',  // sidebar -> recorder: save failed, keep the audio

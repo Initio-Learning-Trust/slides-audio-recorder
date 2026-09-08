@@ -4,14 +4,15 @@
 
 1. Open your presentation and go to the slide you want the audio on.
 2. Choose **Extensions ▸ Slides Audio Recorder ▸ Record audio**. The sidebar opens on the right.
-3. Press **Record**. A small recording window opens.
+3. Tap the round **record button**. A small recording window opens.
 4. The first time, your browser asks for microphone permission — choose **Allow**.
-5. Press **Record** in that window, speak, then press **Stop**.
-6. Listen back. Not happy? **Record again**.
-7. Give it a name (for example *Bonjour, je m'appelle...*) and press **Use recording**.
+5. Tap record in that window and speak. The waveform moves in both windows as you talk.
+6. Tap the button again to stop. The window closes itself and the sidebar shows your take.
+7. Listen back. Not happy? **Re-record**. Happy? Name the button, pick a style, and press
+   **Insert into current slide**.
 
-The window closes, the recording is saved to your Google Drive, and a blue **▶ Listen** button
-appears on your slide.
+The recording is saved to your Google Drive and a **Listen** button appears on your slide. The
+sidebar then shows you how to make it play inside the slide, if you want that.
 
 ## Why does a separate window open?
 

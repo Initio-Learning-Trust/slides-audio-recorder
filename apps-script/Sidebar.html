@@ -6,119 +6,204 @@
   <?!= include('SidebarCss'); ?>
 </head>
 <body>
+<div class="app">
+  <header>
+    <img class="mark" id="mark" src="" alt="">
+    <h1 id="title">Audio Recorder</h1>
+    <span class="where" id="where"></span>
+  </header>
 
-<h1 id="title">Slides Audio Recorder</h1>
-<p class="slide-line" id="slide-line">Loading&hellip;</p>
+  <main>
+    <!-- IDLE -->
+    <section class="panel" data-panel="idle" data-active>
+      <p class="lead">Records into the slide you have open. Audio is saved to your Drive and added to
+        the slide as a play button.</p>
 
-<button type="button" class="primary" id="btn-record" disabled>
-  <span class="dot" aria-hidden="true"></span> Record
-</button>
+      <div class="recWrap">
+        <div class="recStack">
+          <span class="ring"></span><span class="ring"></span>
+          <button class="recBtn" id="btn-record" aria-label="Start recording" disabled>
+            <span class="glyph"></span>
+          </button>
+        </div>
+        <div class="hint" id="idle-hint">Tap to record</div>
+      </div>
 
-<div id="progress-wrap" hidden>
-  <div class="progress"><span id="progress-bar"></span></div>
-  <p class="status" id="progress-text" role="status" aria-live="polite"></p>
-  <button type="button" class="link danger" id="btn-cancel">Cancel</button>
+      <div class="err" id="idle-err" hidden></div>
+
+      <div id="idle-clips-wrap" hidden>
+        <div class="rule" style="margin-bottom:14px"></div>
+        <div class="stack tight">
+          <div class="label">Clips in this deck</div>
+          <div class="stack tight" id="idle-clips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECORDING -->
+    <section class="panel" data-panel="rec">
+      <div class="status">
+        <span class="dot"></span><span class="name">Recording</span>
+        <span class="time" id="clock">0:00</span>
+      </div>
+      <div class="scope is-idle" id="scope"></div>
+      <div class="recWrap">
+        <div class="recStack is-live">
+          <span class="ring"></span><span class="ring"></span>
+          <button class="recBtn is-recording" id="btn-stop" aria-label="Stop recording">
+            <span class="glyph"></span>
+          </button>
+        </div>
+        <div class="hint">Tap to stop</div>
+      </div>
+      <p class="note" style="text-align:center">Recording happens in the small window Google opened.
+        Keep it open until you stop.</p>
+      <div class="err" id="rec-err" hidden></div>
+    </section>
+
+    <!-- REVIEW -->
+    <section class="panel" data-panel="review">
+      <div class="stack tight">
+        <div class="label">Review</div>
+        <div class="card">
+          <div class="playRow">
+            <button class="play" id="btn-play" aria-label="Play">&#9654;</button>
+            <div class="bars" id="bars"></div>
+            <span class="time" id="dur" style="margin:0;font-size:11px">0:00</span>
+          </div>
+          <div class="btnRow">
+            <button class="ghost" id="btn-again">Re-record</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack tight">
+        <div class="label">Button on the slide</div>
+        <label class="field">
+          <span class="sr-only">Button text</span>
+          <input type="text" id="opt-label" maxlength="60" placeholder="Listen">
+        </label>
+        <div class="radios">
+          <label class="radio"><input type="radio" name="style" value="chip"><span class="box"><b></b></span>Button with text</label>
+          <label class="radio"><input type="radio" name="style" value="dot"><span class="box"><b></b></span>Small round button</label>
+          <label class="radio"><input type="radio" name="style" value="text"><span class="box"><b></b></span>Plain hyperlinked text</label>
+        </div>
+      </div>
+
+      <div class="err" id="review-err" hidden></div>
+
+      <div class="stack tight at-end" id="save-block" style="margin-top:auto">
+        <div class="track" id="track" hidden><b id="track-fill"></b></div>
+        <p class="note" id="save-note" hidden></p>
+        <button class="primary" id="btn-insert">Insert into current slide</button>
+      </div>
+    </section>
+
+    <!-- DONE -->
+    <section class="panel" data-panel="done">
+      <div class="toast"><span class="tick">&#10003;</span><span id="done-msg">Added to the slide</span></div>
+
+      <div class="howto">
+        <h2>Want it to play inside the slide?</h2>
+        <p>The button we added opens the recording in a new tab. Google does not let add-ons place its
+          own audio icon, so add that yourself &mdash; it takes three clicks.</p>
+
+        <div class="demo" id="demo">
+          <div class="d-bar">
+            <span>File</span><span>Edit</span><span>View</span>
+            <span class="d-insert">Insert</span><span>Format</span>
+          </div>
+          <div class="d-menu">
+            <span>Image</span><span>Text box</span><span class="d-audio">Audio</span><span>Video</span>
+          </div>
+          <div class="d-picker">
+            <div class="d-search">Search Drive</div>
+            <div class="d-row"><span class="d-wav">&#9835;</span><span id="demo-file">your recording.wav</span></div>
+            <div class="d-cta"><b>Insert</b></div>
+          </div>
+          <span class="d-cursor"></span>
+        </div>
+
+        <ol>
+          <li>Choose <b>Insert &rsaquo; Audio</b>.</li>
+          <li>Paste the file name below into the search box.</li>
+          <li>Select it and press <b>Insert</b>.</li>
+        </ol>
+
+        <div class="filename">
+          <label class="sr-only" for="native-name">File name</label>
+          <input type="text" id="native-name" readonly>
+          <button class="ghost" id="btn-copy-name">Copy</button>
+        </div>
+        <p class="note" id="native-path" style="margin-top:8px"></p>
+      </div>
+
+      <div class="stack tight">
+        <div class="label">Clips in this deck</div>
+        <div class="stack tight" id="done-clips"></div>
+      </div>
+
+      <button class="ghost" id="btn-another" style="margin-top:auto;padding:13px">Record another clip</button>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="panel" data-panel="settings">
+      <div class="label">Settings</div>
+
+      <label class="field">
+        <span class="label" style="letter-spacing:.06em">Recording quality</span>
+        <select id="set-rate">
+          <option value="16000">Voice, smallest files (16 kHz)</option>
+          <option value="22050">Voice, recommended (22 kHz)</option>
+          <option value="44100">Music quality, large files (44 kHz)</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="label" style="letter-spacing:.06em">Who can listen</span>
+        <select id="set-sharing">
+          <option value="domain">Anyone in my organisation with the link</option>
+          <option value="anyone">Anyone with the link</option>
+          <option value="private">Only me</option>
+        </select>
+      </label>
+      <p class="note">Students cannot hear a recording they have no access to. This is applied to each
+        new recording as it is saved.</p>
+
+      <label class="field">
+        <span class="label" style="letter-spacing:.06em">Position on slide</span>
+        <select id="set-position">
+          <option value="bottom-left">Bottom left</option>
+          <option value="bottom-right">Bottom right</option>
+          <option value="top-left">Top left</option>
+          <option value="top-right">Top right</option>
+          <option value="centre">Centre</option>
+        </select>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="set-notes">
+        <span>Also add a link in the speaker notes</span>
+      </label>
+
+      <div class="err" id="settings-err" hidden></div>
+
+      <div class="btnRow" style="margin-top:auto">
+        <button class="ghost" id="btn-settings-back">Back</button>
+        <button class="ghost" id="btn-folder-open" hidden>Drive folder</button>
+      </div>
+      <button class="primary" id="btn-save-settings">Save settings</button>
+    </section>
+  </main>
+
+  <footer>
+    <span id="version">Initio Audio Recorder</span>
+    <a href="#" id="link-settings">Settings</a>
+    <a id="link-help" href="#" target="_blank" rel="noopener">Help</a>
+  </footer>
 </div>
 
-<div id="messages"></div>
-
-<details id="insert-options">
-  <summary>Insert options</summary>
-  <div class="card">
-    <label class="field">
-      <span>Button text</span>
-      <input type="text" id="opt-label" maxlength="60">
-    </label>
-    <label class="field">
-      <span>Style</span>
-      <select id="opt-style">
-        <option value="chip">Blue button with text</option>
-        <option value="dot">Small round play button</option>
-        <option value="text">Plain hyperlinked text</option>
-      </select>
-    </label>
-    <label class="field">
-      <span>Position on slide</span>
-      <select id="opt-position">
-        <option value="bottom-left">Bottom left</option>
-        <option value="bottom-right">Bottom right</option>
-        <option value="top-left">Top left</option>
-        <option value="top-right">Top right</option>
-        <option value="centre">Centre</option>
-      </select>
-    </label>
-    <label class="check">
-      <input type="checkbox" id="opt-notes">
-      <span>Also add a link in the speaker notes</span>
-    </label>
-    <label class="check">
-      <input type="checkbox" id="opt-auto">
-      <span>Add to the slide automatically after recording</span>
-    </label>
-  </div>
-</details>
-
-<div class="card">
-  <h2>Recordings in this presentation</h2>
-  <ul class="recordings" id="recordings"></ul>
-  <p class="empty" id="recordings-empty">Nothing recorded yet.</p>
-</div>
-
-<details id="native-help">
-  <summary>Play inside the slide instead (native audio)</summary>
-  <div class="card">
-    <p class="empty">Google does not let add-ons place a native audio icon, so the button above opens
-      the recording in a new tab. For playback inside the slide itself, insert the same file by hand:</p>
-    <ol class="steps">
-      <li>Choose <strong>Insert &rsaquo; Audio</strong>.</li>
-      <li>Paste the file name below into the dialog's search box &ndash; or open
-        <strong>Recent</strong>, where a just-saved recording is usually at the top.</li>
-      <li>Pick it and press <strong>Insert</strong>.</li>
-    </ol>
-    <label class="field">
-      <span>File name</span>
-      <input type="text" id="native-name" readonly value="Record something first">
-    </label>
-    <div class="row wrap">
-      <button type="button" id="btn-copy-name" disabled>Copy name</button>
-      <a id="native-folder" href="#" target="_blank" rel="noopener" hidden>Open the folder in Drive</a>
-    </div>
-    <p class="status" id="native-path"></p>
-  </div>
-</details>
-
-<details id="settings">
-  <summary>Settings</summary>
-  <div class="card">
-    <label class="field">
-      <span>Recording quality</span>
-      <select id="set-rate">
-        <option value="16000">Voice, smallest files (16 kHz)</option>
-        <option value="22050">Voice, recommended (22 kHz)</option>
-        <option value="44100">Music quality, large files (44 kHz)</option>
-      </select>
-    </label>
-    <label class="field">
-      <span>Who can listen</span>
-      <select id="set-sharing">
-        <option value="domain">Anyone in my organisation with the link</option>
-        <option value="anyone">Anyone with the link</option>
-        <option value="private">Only me</option>
-      </select>
-    </label>
-    <p class="status">Students cannot hear a recording they have no access to. This setting is applied
-      to each new recording as it is saved.</p>
-    <div class="row" style="margin-top:8px">
-      <button type="button" id="btn-save-settings">Save settings</button>
-      <a id="folder-link" href="#" target="_blank" hidden>Open Drive folder</a>
-    </div>
-  </div>
-</details>
-
-<p class="status" style="margin-top:14px">
-  <a id="support-link" href="#" target="_blank">Help and troubleshooting</a>
-</p>
-
+<?!= include('Brand'); ?>
 <?!= include('Protocol'); ?>
 <?!= include('SidebarJs'); ?>
 </body>
