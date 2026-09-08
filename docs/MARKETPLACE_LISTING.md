@@ -15,7 +15,7 @@ which is why this is not "Audio Recorder for Google Slides".
 ## Short description (≤ 200 characters)
 
 ```
-Record narration for the slide you have open - saved to your Drive, added as a play button. Made for language teachers: pronunciation models, listening prompts and spoken feedback.
+Record narration for the slide you have open, saved straight to your Drive. Made for language teachers: pronunciation models, listening prompts and spoken feedback.
 ```
 
 ## Detailed description (< 16,000 characters)
@@ -24,7 +24,8 @@ Record narration for the slide you have open - saved to your Drive, added as a p
 Slides Audio Recorder puts a microphone in your presentation.
 
 Open the sidebar, press Record, speak, and the recording is saved to your Google Drive and added to
-the slide as a play button. No downloads, no separate recording app, no fiddling with files.
+the slide with Insert > Audio, which the sidebar walks you through. No downloads, no separate
+recording app, no fiddling with files.
 
 BUILT FOR LANGUAGE TEACHING
 - Model a phrase in the target language and put it on the slide next to the text
@@ -68,8 +69,8 @@ per-file Drive access to files it creates, and access to the presentation you ha
 Drive, and not your other presentations.
 
 ACCESSIBILITY
-Every control is keyboard reachable, status messages are announced to screen readers, and inserted
-play buttons carry alt text naming the recording.
+Every control is keyboard reachable, status messages are announced to screen readers, and the
+animated walkthrough can be paused and replayed at any point.
 
 Free, and open source: github.com/Initio-Learning-Trust/slides-audio-recorder
 ```
@@ -99,7 +100,7 @@ services, so keep the Slides chrome in frame:
 2. **Mid-recording**, with the sidebar waveform moving and the recording window alongside it.
 3. **The review panel**, showing the played-back waveform and the button styles.
 4. **The done panel**, showing the "play inside the slide" instructions and the demo.
-5. **A slide with the play button on it**, plus the Drive folder of recordings.
+5. **The walkthrough dialog open** over the presentation, mid-step.
 
 Use a deck with real language-teaching content rather than lorem ipsum — reviewers and teachers both
 respond to it, and it demonstrates the use case in one glance.
