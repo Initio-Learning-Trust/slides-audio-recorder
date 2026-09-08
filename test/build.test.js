@@ -52,3 +52,20 @@ test('the sidebar includes the protocol before its controller', () => {
   const html = fs.readFileSync(path.join(ROOT, 'apps-script', 'Sidebar.html'), 'utf8');
   assert.ok(html.indexOf("include('Protocol')") < html.indexOf("include('SidebarJs')"));
 });
+
+test('every element the sidebar controller looks up exists in the sidebar markup', () => {
+  const dir = path.join(ROOT, 'apps-script');
+  const controller = fs.readFileSync(path.join(dir, 'SidebarJs.html'), 'utf8');
+  const markup = fs.readFileSync(path.join(dir, 'Sidebar.html'), 'utf8');
+  const ids = new Set();
+  const pattern = /\$\('([^']+)'\)/g;
+  let match;
+  while ((match = pattern.exec(controller)) !== null) {
+    ids.add(match[1]);
+  }
+  assert.ok(ids.size > 10, 'expected the controller to look up a number of elements');
+  ids.forEach((id) => {
+    assert.ok(markup.includes('id="' + id + '"'),
+        'Sidebar.html has no element with id="' + id + '"');
+  });
+});

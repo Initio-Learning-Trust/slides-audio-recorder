@@ -23,8 +23,8 @@ Google Slides sidebar  ──►  recording window  ──►  Drive (WAV)  ─�
   private — as it is saved.
 - **Keep a per-deck library.** Every recording made in a presentation is listed in the sidebar to
   replay, re-insert on another slide, rename or delete.
-- **Guided native insert.** For playback *inside* the slide, the sidebar shows the exact file name
-  to pick in `Insert ▸ Audio`.
+- **Guided native insert.** For playback *inside* the slide, the sidebar hands you the exact file
+  name to search for in `Insert ▸ Audio`, plus a link to the Drive folder.
 
 ## Two constraints that shaped the design
 
@@ -56,7 +56,7 @@ Both are Google platform limits, not choices. [docs/RESEARCH.md](docs/RESEARCH.m
 
 ```bash
 npm install
-npm test                 # 43 unit tests
+npm test                 # 44 unit tests
 npm run test:e2e         # 8 browser assertions: real mic capture across two origins
 npm run build            # regenerate apps-script/Protocol.html from the shared source
 

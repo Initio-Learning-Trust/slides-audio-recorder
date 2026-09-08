@@ -5,7 +5,7 @@ Two automated layers, then a manual pass for the parts that need Google Slides i
 ## Automated
 
 ```bash
-npm test           # 43 unit assertions, no browser needed
+npm test           # 44 unit assertions, no browser needed
 npm run test:e2e   # 8 assertions in a real Chromium, with a fake microphone
 npm run verify     # rebuild the protocol include, fail if stale, then both suites
 ```
@@ -76,9 +76,13 @@ rather than reporting success.
 ## Manual: the native insert path
 
 1. Record something.
-2. Open **Play inside the slide instead** — the newest file name is shown.
-3. **Insert ▸ Audio ▸ Recent** — that file is at the top of the list.
-4. Insert it; the speaker icon plays inline.
+2. Open **Play inside the slide instead** — the newest file name is shown, and **Copy name** works
+   (or, if the sandbox blocks the copy command, the name is selected ready for Ctrl+C).
+3. **Insert ▸ Audio**, paste the name into the search box — the file is found.
+4. Check the **Recent** tab as well, and note whether the recording appears near the top. This is
+   Drive's own recency heuristic rather than a guarantee, so search is the documented route.
+5. Insert it; the speaker icon plays inline.
+6. Follow **Open the folder in Drive** — it lands in the presentation's recordings folder.
 
 ## Browsers
 

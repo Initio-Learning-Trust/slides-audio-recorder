@@ -137,6 +137,7 @@ function finaliseRecording_(file, session) {
     durationMs: session.durationMs,
     sampleRate: session.sampleRate,
     label: session.label,
+    folderId: session.folderId,
     slideObjectId: session.slideObjectId,
     createdAt: meta.createdTime || new Date().toISOString(),
     sharing: sharing.mode,

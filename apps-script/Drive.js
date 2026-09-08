@@ -151,6 +151,14 @@ function getPresentationFolderId_(create) {
 }
 
 /**
+ * @return {?string} URL of this presentation's recordings folder, if it exists.
+ */
+function getPresentationFolderUrl() {
+  var id = getPresentationFolderId_(false);
+  return id ? 'https://drive.google.com/drive/folders/' + id : null;
+}
+
+/**
  * Opens a Drive resumable upload session.
  * @param {string} name File name.
  * @param {string} mimeType File MIME type.

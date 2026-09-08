@@ -58,7 +58,7 @@ Slides Audio Recorder / <your presentation name>.
 PLAY INSIDE THE SLIDE
 Google does not let add-ons place its native audio icon, so the button we add opens the recording in
 a new tab. If you want playback inside the slide itself, the sidebar walks you through
-Insert > Audio and names the exact file to pick - it will be at the top of Recent.
+Insert > Audio, gives you the exact file name to search for, and links straight to the folder.
 
 YOUR DATA STAYS YOURS
 Audio is recorded and encoded in your browser and written straight to your own Google Drive. We

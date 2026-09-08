@@ -100,7 +100,8 @@ function getBootstrap() {
     settings: getSettings(),
     recordings: listRecordings(),
     presentation: describePresentation_(),
-    slide: describeCurrentSlide()
+    slide: describeCurrentSlide(),
+    folderUrl: getPresentationFolderUrl()
   };
 }
 

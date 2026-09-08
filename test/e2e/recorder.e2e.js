@@ -158,8 +158,11 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     assert.equal(audio.label, 'Bonjour tout le monde');
     assert.ok(audio.durationMs > 800, 'expected at least ~1s of audio, got ' + audio.durationMs + 'ms');
     assert.ok(audio.byteLength > 44, 'the file should contain samples, not just a header');
-    assert.equal(audio.byteLength, 44 + Math.round(audio.durationMs / 1000 * 22050) * 2,
-        'file size should match the reported duration');
+    // The reported duration is rounded to whole milliseconds, so compare the
+    // duration implied by the file size rather than demanding an exact match.
+    const impliedMs = ((audio.byteLength - 44) / 2) / audio.sampleRate * 1000;
+    assert.ok(Math.abs(impliedMs - audio.durationMs) < 5,
+        'file size implies ' + impliedMs.toFixed(1) + 'ms but ' + audio.durationMs + 'ms was reported');
     assert.ok(audio.peak > 1000,
         'expected the fake microphone tone to be audible, peak was ' + audio.peak);
   });

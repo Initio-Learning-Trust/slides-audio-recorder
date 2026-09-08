@@ -30,8 +30,12 @@ If you would rather the audio played without leaving the slide, use Google's own
 **Play inside the slide instead** in the sidebar, then:
 
 1. **Insert ▸ Audio**
-2. Open **Recent** — your newest recording is at the top; the sidebar shows the exact file name
+2. Paste the file name from the sidebar into the dialog's search box — press **Copy name** first.
+   (**Recent** usually has a just-saved recording at the top too, but searching always finds it.)
 3. Select it and press **Insert**
+
+The sidebar also links straight to the Drive folder, so you can browse to it instead:
+**My Drive ▸ Slides Audio Recorder ▸ <your presentation name>**.
 
 You then get Google's speaker icon, which plays in place and can be set to start automatically
 (select it, then **Format options ▸ Audio playback**).

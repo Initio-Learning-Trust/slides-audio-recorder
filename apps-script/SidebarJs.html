@@ -461,17 +461,72 @@
 
   /**
    * Shows the file name to look for in the Insert > Audio picker.
+   *
+   * The picker's Recent tab usually surfaces a just-saved recording first, but
+   * that is Drive's own recency heuristic rather than a guarantee. Searching by
+   * name always works, so the exact name is offered here to copy.
+   *
    * @param {Object} recording The most recent recording.
    */
   function updateNativeHelp(recording) {
     if (!recording) {
       return;
     }
-    el.nativeFile.innerHTML = '';
-    el.nativeFile.appendChild(document.createTextNode('Newest file: '));
-    var code = document.createElement('code');
-    code.textContent = recording.name;
-    el.nativeFile.appendChild(code);
+    el.nativeName.value = recording.name;
+    el.btnCopyName.disabled = false;
+    el.nativePath.textContent = 'Saved in My Drive > Slides Audio Recorder > ' +
+        (boot.presentation ? boot.presentation.name : 'this presentation');
+    var folderUrl = folderUrlFor(recording);
+    if (folderUrl) {
+      boot.folderUrl = folderUrl;
+      showFolderLinks(folderUrl);
+    }
+  }
+
+  /**
+   * @param {Object} recording A recording record.
+   * @return {?string} URL of the Drive folder holding it, when known.
+   */
+  function folderUrlFor(recording) {
+    if (boot.folderUrl) {
+      return boot.folderUrl;
+    }
+    return recording && recording.folderId ?
+        'https://drive.google.com/drive/folders/' + recording.folderId : null;
+  }
+
+  /**
+   * Reveals the "open the folder" links once a folder exists.
+   * @param {string} url Drive folder URL.
+   */
+  function showFolderLinks(url) {
+    [el.nativeFolder, el.folderLink].forEach(function (link) {
+      if (link) {
+        link.href = url;
+        link.hidden = false;
+      }
+    });
+  }
+
+  /**
+   * Copies the file name so it can be pasted into the picker's search box.
+   *
+   * The clipboard API is unreliable inside the add-on's sandboxed iframe, so
+   * this selects the text and tries the legacy copy command, falling back to
+   * telling the teacher to press the shortcut themselves.
+   */
+  function copyFileName() {
+    el.nativeName.focus();
+    el.nativeName.select();
+    var copied = false;
+    try {
+      copied = document.execCommand('copy');
+    } catch (err) {
+      copied = false;
+    }
+    notify(copied ? 'ok' : 'info', copied ?
+        'File name copied. Paste it into Insert > Audio.' :
+        'The name is selected - press Ctrl+C (Cmd+C on a Mac) to copy it.');
   }
 
   /**
@@ -548,7 +603,11 @@
       optAuto: $('opt-auto'),
       recordings: $('recordings'),
       recordingsEmpty: $('recordings-empty'),
-      nativeFile: $('native-file'),
+      nativeName: $('native-name'),
+      btnCopyName: $('btn-copy-name'),
+      nativeFolder: $('native-folder'),
+      nativePath: $('native-path'),
+      folderLink: $('folder-link'),
       setRate: $('set-rate'),
       setSharing: $('set-sharing'),
       btnSaveSettings: $('btn-save-settings'),
@@ -565,6 +624,7 @@
       el.progressText.textContent = 'Cancelling...';
     });
     el.btnSaveSettings.addEventListener('click', saveSettings);
+    el.btnCopyName.addEventListener('click', copyFileName);
     window.addEventListener('message', onMessage);
 
     call('getBootstrap').then(function (data) {
@@ -573,6 +633,9 @@
       el.supportLink.href = boot.supportUrl;
       applySettings();
       renderRecordings();
+      if (boot.folderUrl) {
+        showFolderLinks(boot.folderUrl);
+      }
       if (boot.recordings && boot.recordings.length) {
         updateNativeHelp(boot.recordings[0]);
       }

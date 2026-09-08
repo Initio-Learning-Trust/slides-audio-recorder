@@ -71,10 +71,19 @@
       the recording in a new tab. For playback inside the slide itself, insert the same file by hand:</p>
     <ol class="steps">
       <li>Choose <strong>Insert &rsaquo; Audio</strong>.</li>
-      <li>Open <strong>Recent</strong> &ndash; your newest recording is at the top.</li>
+      <li>Paste the file name below into the dialog's search box &ndash; or open
+        <strong>Recent</strong>, where a just-saved recording is usually at the top.</li>
       <li>Pick it and press <strong>Insert</strong>.</li>
     </ol>
-    <p class="status" id="native-file">Record something first and its file name will appear here.</p>
+    <label class="field">
+      <span>File name</span>
+      <input type="text" id="native-name" readonly value="Record something first">
+    </label>
+    <div class="row wrap">
+      <button type="button" id="btn-copy-name" disabled>Copy name</button>
+      <a id="native-folder" href="#" target="_blank" rel="noopener" hidden>Open the folder in Drive</a>
+    </div>
+    <p class="status" id="native-path"></p>
   </div>
 </details>
 
