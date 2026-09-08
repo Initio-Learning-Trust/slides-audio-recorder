@@ -32,7 +32,10 @@
     nonce: nonce,
     events: [],
     audio: null,
-    ackSent: false
+    ackSent: false,
+    levelFrames: 0,
+    maxLevel: 0,
+    sawRecordingState: false
   };
 
   /**
@@ -67,6 +70,22 @@
     }
     log('accepted ' + data.type);
 
+    if (data.type === SarProtocol.TYPES.STATE) {
+      if (data.state === 'recording') {
+        window.__harness.sawRecordingState = true;
+      }
+      return;
+    }
+    if (data.type === SarProtocol.TYPES.LEVELS) {
+      // The sidebar draws its waveform from these; count them to prove they flow.
+      window.__harness.levelFrames++;
+      window.__harness.lastLevels = data.values;
+      // Chrome's fake microphone beeps intermittently, so the meaningful
+      // measure is the loudest value seen across the whole take.
+      window.__harness.maxLevel = Math.max.apply(null,
+          [window.__harness.maxLevel].concat(data.values));
+      return;
+    }
     if (data.type === SarProtocol.TYPES.READY) {
       popup.postMessage(SarProtocol.envelope(SarProtocol.TYPES.ACK, nonce), recorderOrigin);
       window.__harness.ackSent = true;
@@ -78,7 +97,6 @@
         byteLength: bytes.length,
         sampleRate: data.sampleRate,
         durationMs: data.durationMs,
-        label: data.label,
         mimeType: data.mimeType,
         header: String.fromCharCode.apply(null, bytes.subarray(0, 4)) +
                 String.fromCharCode.apply(null, bytes.subarray(8, 12)),

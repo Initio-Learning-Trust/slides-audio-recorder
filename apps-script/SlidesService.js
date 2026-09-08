@@ -150,14 +150,15 @@ function insertChip_(slide, geometry, style, label, url) {
   shape.getBorder().setTransparent();
   shape.setContentAlignment(SlidesApp.ContentAlignment.MIDDLE);
 
+  // Shape.getText() already returns a TextRange covering the whole shape;
+  // TextRange.getRange() takes two offsets and is not a no-argument accessor.
   var text = shape.getText();
   text.setText(chipText(style, label));
-  var range = text.getRange();
-  range.getTextStyle()
+  text.getTextStyle()
       .setForegroundColor(CONTROL_TEXT)
       .setFontSize(style === 'dot' ? 12 : 11)
       .setBold(true);
-  range.getParagraphStyle().setParagraphAlignment(SlidesApp.ParagraphAlignment.CENTER);
+  text.getParagraphStyle().setParagraphAlignment(SlidesApp.ParagraphAlignment.CENTER);
 
   shape.setLinkUrl(url);
   return shape;
@@ -175,8 +176,7 @@ function insertChip_(slide, geometry, style, label, url) {
 function insertTextLink_(slide, geometry, label, url) {
   var box = slide.insertTextBox(chipText('text', label),
       geometry.left, geometry.top, geometry.width, geometry.height);
-  var range = box.getText().getRange();
-  range.getTextStyle().setFontSize(11).setLinkUrl(url);
+  box.getText().getTextStyle().setFontSize(11).setLinkUrl(url);
   return box;
 }
 

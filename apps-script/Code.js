@@ -104,6 +104,8 @@ function getBootstrap() {
   var target = getRecorderTarget();
   return {
     addonName: ADDON_NAME,
+    version: ADDON_VERSION,
+    howtoAnimationUrl: getHowToAnimationUrl(),
     recorderUrl: target.url,
     recorderOrigin: target.origin,
     supportUrl: SUPPORT_URL,

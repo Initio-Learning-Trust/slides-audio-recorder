@@ -5,8 +5,8 @@ Two automated layers, then a manual pass for the parts that need Google Slides i
 ## Automated
 
 ```bash
-npm test           # 44 unit assertions, no browser needed
-npm run test:e2e   # 8 assertions in a real Chromium, with a fake microphone
+npm test           # 54 unit assertions, no browser needed
+npm run test:e2e   # 9 assertions in a real Chromium, with a fake microphone
 npm run verify     # rebuild the protocol include, fail if stale, then both suites
 ```
 
@@ -32,12 +32,12 @@ CI runs both suites on every push, and additionally syntax-checks every `.js` fi
 
 1. Open a presentation, go to slide 3, open the sidebar.
 2. The header reads **Slide 3 of N**.
-3. Press **Record** — the recording window opens and the sidebar says it opened.
-4. Allow the microphone. Record about five seconds of speech.
-5. The level meter moves and the waveform scrolls while recording.
-6. Press **Stop**. The preview plays back what you said. Duration and size look right.
-7. Name it, press **Use recording**.
-8. The window shows *Saved*; the sidebar shows progress, then *Added to slide 3*.
+3. Tap the record button — the recording window opens.
+4. Allow the microphone, then tap record there. Record about five seconds of speech.
+5. **Both** windows show the waveform moving, and the sidebar clock counts up.
+6. Tap the button again to stop. The window closes itself and the sidebar shows the review panel.
+7. Play it back. Duration looks right and the bars colour in as it plays.
+8. Name the button, press **Insert into current slide**; progress runs, then *Added to slide 3*.
 9. A blue **▶ Listen** button is on slide 3, in the bottom-left corner.
 10. Clicking it opens the recording in Drive and it plays.
 11. The recording appears in the sidebar list with duration, size and sharing.
@@ -51,7 +51,8 @@ CI runs both suites on every push, and additionally syntax-checks every `.js` fi
 | Deny the microphone | Recording window explains how to re-allow it via the address bar |
 | Press Stop with no audio (muted mic) | "No audio was captured" rather than a zero-length file |
 | Close the recording window mid-recording | Browser warns about leaving; sidebar recovers on next Record |
-| Close the sidebar, then press Use recording | Window says the sidebar has closed; audio is not lost |
+| Close the sidebar, then stop the recording | Window says the sidebar has closed; it stays open rather than discarding the take |
+| Stop from the sidebar's stop button | The recording window stops too, and hands the audio over |
 | Reload the sidebar mid-upload | Upload session expires cleanly; no orphan file in Drive |
 | Press Cancel during upload | Upload stops, Drive session is abandoned, no file appears |
 | Record a 5-minute clip | Multiple chunks, progress advances smoothly, file plays in full |
