@@ -21,6 +21,17 @@
   /** How often meter values are posted to the sidebar, in milliseconds. */
   var LEVEL_INTERVAL_MS = 80;
 
+  /**
+   * Content hash stamped into the page by the build, used to bust caches on the
+   * worklet the same way it is busted on the page's other assets.
+   * @return {string} The version query string, including the leading '?'.
+   */
+  function assetVersion() {
+    var meta = document.querySelector('meta[name="asset-version"]');
+    var value = meta && meta.getAttribute('content');
+    return value ? '?v=' + value : '';
+  }
+
   var params = SarProtocol.parseLaunchParams(location.search);
   var peer = window.opener;
   var acknowledged = false;
@@ -195,7 +206,7 @@
   function attachCapture() {
     var context = state.context;
     if (context.audioWorklet) {
-      return context.audioWorklet.addModule('capture-worklet.js').then(function () {
+      return context.audioWorklet.addModule('capture-worklet.js' + assetVersion()).then(function () {
         var node = new AudioWorkletNode(context, 'sar-capture', {
           numberOfInputs: 1,
           numberOfOutputs: 0,
