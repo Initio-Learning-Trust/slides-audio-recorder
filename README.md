@@ -6,25 +6,25 @@ pronunciation or a listening prompt straight into the deck, with no downloads, n
 no separate recording app.
 
 ```
-Google Slides sidebar  ──►  recording window  ──►  Drive (WAV)  ──►  play button on the slide
-   (Apps Script)            (our own origin)      (drive.file)        (linked shape)
+Google Slides sidebar  ──►  recording window  ──►  Drive (WAV)  ──►  Insert ▸ Audio
+   (Apps Script)          record, hear it back,     (drive.file)     (the teacher, guided
+                              name it                                 by the walkthrough)
 ```
 
 ## What it does
 
-- **Record from the sidebar.** One button opens a small recording window; the sidebar shows the
-  live waveform and timer, and you review and name the take there. Re-record until you are happy.
+- **Record from the sidebar.** One button opens a small recording window; you hear the take back
+  and name it there, while the sidebar mirrors the live waveform and timer.
 - **Save to Drive automatically.** Recordings go into `Slide Audio Recordings / <presentation name>`
   as 16-bit WAV, named by slide number so they are easy to find later.
-- **Insert with one click.** A play control (blue button, small round button, or plain hyperlinked
-  text) is added to the current slide, linked to the recording.
+- **Shows you the last step.** Google only lets you place audio yourself, so the add-on saves the
+  file, hands you its name, and plays an animated walkthrough of `Insert ▸ Audio`.
 - **Get the sharing right.** The commonest reason classroom audio "doesn't work" is that students
   cannot open the file. Each recording is shared as you choose — organisation-wide, link, or
   private — as it is saved.
 - **Keep a per-deck library.** Every recording made in a presentation is listed in the sidebar to
-  replay, re-insert on another slide, rename or delete.
-- **Guided native insert.** For playback *inside* the slide, the sidebar hands you the exact file
-  name to search for in `Insert ▸ Audio`, plus a link to the Drive folder.
+  replay, look up again or delete.
+- **Nothing you did not ask for.** The add-on puts no shape, chip or link on your slide.
 
 ## Two constraints that shaped the design
 
@@ -35,10 +35,10 @@ Both are Google platform limits, not choices. [docs/RESEARCH.md](docs/RESEARCH.m
    the user allows. Capture therefore happens in a small top-level window served from our own
    origin, which hands the finished audio back over `postMessage`. That window holds no
    credentials, sets no cookies and talks to no server.
-2. **The Slides API cannot insert native audio.** There is no `createAudio` request and no audio
-   page element — only shapes, images, tables, lines and video. So the add-on inserts a linked play
-   control (works everywhere, one click) and *also* walks you through `Insert ▸ Audio` when you want
-   Google's own inline player.
+2. **The Slides API cannot insert audio.** There is no `createAudio` request and no audio page
+   element — only shapes, images, tables, lines and video. An add-on could drop a linked shape
+   instead, but that is a second, worse-behaved control sitting beside the real one, so this one
+   teaches the native route rather than competing with it.
 
 ## Repository layout
 
@@ -47,19 +47,19 @@ Both are Google platform limits, not choices. [docs/RESEARCH.md](docs/RESEARCH.m
 | `apps-script/` | The add-on itself. `clasp` root — this is what gets pushed to Apps Script. |
 | `recorder/` | The static recording window, deployed to GitHub Pages. |
 | `site/` | Landing page, privacy policy and terms, published alongside the recorder. |
-| `tools/` | Build helpers: protocol sync, brand-icon inlining. |
+| `tools/` | Build helpers: protocol sync, brand-icon inlining, walkthrough compiler, asset stamping. |
 | `test/` | Node unit tests, plus a Playwright end-to-end test of the recording bridge. |
 | `docs/` | Architecture, deployment runbook, listing copy, security and research notes. |
 | `assets/` | Marketplace icons and card banner from Initio's design handoff. |
-| `docs/design/` | The design handoff this UI is built to, kept for reference. |
+| `docs/design/` | The design handoff this UI is built to, and the walkthrough's design source. |
 
 ## Quick start
 
 ```bash
 npm install
-npm test                 # 54 unit tests
+npm test                 # 46 unit tests
 npm run test:e2e         # 9 browser assertions: real mic capture across two origins
-npm run build            # regenerate apps-script/Protocol.html from the shared source
+npm run build            # regenerate the generated Apps Script files and asset stamps
 
 npx clasp login
 npx clasp create --title "Slides Audio Recorder" --type slides --rootDir apps-script
@@ -80,6 +80,7 @@ project and configure the Marketplace SDK.
 - [Test plan](docs/TESTING.md) — automated coverage and the manual pass before a release
 - [Research notes](docs/RESEARCH.md) — the platform limits, with sources
 - [Design handoff](docs/design/HANDOFF.md) — the tokens, state machine and animation spec the UI is built to
+- [Walkthrough](docs/design/WALKTHROUGH.md) — how the animated Insert ▸ Audio dialog is built and changed
 - [Roadmap](docs/ROADMAP.md) — inline playback, MP3, transcripts
 
 ## Licence

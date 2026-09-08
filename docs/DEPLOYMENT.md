@@ -93,14 +93,9 @@ In the Apps Script editor: **Project Settings ▸ Script Properties ▸ Add scri
 | --- | --- |
 | `RECORDER_ORIGIN` | `https://slides-audio.initiolearning.org` |
 | `RECORDER_PATH` | `/recorder/` |
-| `HOWTO_ANIMATION_URL` | `https://slides-audio.initiolearning.org/how-to-insert.mp4` |
-| `HOWTO_ANIMATION_POSTER` | `https://slides-audio.initiolearning.org/how-to-insert-still.png` |
 
-The two animation properties are optional. The sidebar's "play inside the slide" panel draws the
-Insert ▸ Audio journey in CSS by default; set these and it shows a supplied asset instead, with no
-code change. The poster is a still frame shown to anyone who has asked for reduced motion, since a
-looping GIF cannot be paused; without it those users keep the built-in diagram.
-[design/ANIMATION_BRIEF.md](design/ANIMATION_BRIEF.md) specifies the asset.
+The Insert ▸ Audio walkthrough needs no configuration: it is compiled into the add-on by the build.
+See [design/WALKTHROUGH.md](design/WALKTHROUGH.md) to change it.
 
 Script Properties override `DEFAULT_RECORDER_ORIGIN` / `DEFAULT_RECORDER_PATH` in `Config.js`, so a
 deployment can be re-pointed without a code change. The origin must be https; the add-on refuses

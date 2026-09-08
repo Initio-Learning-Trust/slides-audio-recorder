@@ -1,28 +1,24 @@
 /**
  * Everything that touches the open presentation.
  *
- * Google's Slides API has no audio page element -- `createAudio` does not
- * exist, and Apps Script's SlidesApp mirrors the same surface -- so an add-on
- * cannot place a native audio icon. What it can place is a linked shape: a
- * "play control" that opens the recording when clicked, in edit view and in
- * present mode alike. Teachers who want the native inline player use the
- * guided Insert > Audio flow the sidebar offers alongside this.
+ * The add-on deliberately puts nothing on the slide. Google's Slides API has no
+ * audio page element -- `createAudio` does not exist, and Apps Script's
+ * SlidesApp mirrors the same surface -- so the only way to get audio onto a
+ * slide is Insert > Audio, which the teacher does themselves. An add-on could
+ * place a linked shape instead, but that is a second, worse-behaved control
+ * sitting next to the real one, so the sidebar teaches the native route rather
+ * than competing with it.
+ *
+ * What is left here is reading where the teacher is, so recordings can be named
+ * by slide, and optionally leaving the file's link in the speaker notes.
  */
-
-/** Alt-text title stamped on every control we create, so we can find ours. */
-var CONTROL_MARKER = 'Slides Audio Recorder';
-
-/** Fill and text colours for the play control. */
-var CONTROL_FILL = '#1A73E8';
-var CONTROL_TEXT = '#FFFFFF';
 
 /**
  * Describes the slide the user is looking at.
  * @return {{objectId: ?string, number: ?number, total: number, resolved: boolean}}
  */
 function describeCurrentSlide() {
-  var presentation = SlidesApp.getActivePresentation();
-  var slides = presentation.getSlides();
+  var slides = SlidesApp.getActivePresentation().getSlides();
   var found = resolveSlide_(null);
   return {
     objectId: found ? found.objectId : null,
@@ -39,8 +35,7 @@ function describeCurrentSlide() {
  * @private
  */
 function resolveSlide_(objectId) {
-  var presentation = SlidesApp.getActivePresentation();
-  var slides = presentation.getSlides();
+  var slides = SlidesApp.getActivePresentation().getSlides();
   if (!slides.length) {
     return null;
   }
@@ -89,115 +84,23 @@ function slideNumberFor_(objectId) {
 }
 
 /**
- * Places a play control for a recording on a slide.
+ * Notes a recording in a slide's speaker notes.
+ *
+ * Off by default. Teachers who present from notes asked for somewhere to keep
+ * the link, and notes are the one place on a slide that is not also on screen.
+ *
  * @param {string} fileId Drive file id of the recording.
- * @param {{style: ?string, label: ?string, position: ?string,
- *          addToSpeakerNotes: ?boolean, slideObjectId: ?string}=} options
- * @return {{slideNumber: number, objectId: string, url: string}}
+ * @param {?string} slideObjectId Slide to note it on, or null for the current one.
+ * @return {{slideNumber: number}} Where the note landed.
  */
-function insertRecording(fileId, options) {
-  options = options || {};
-  var settings = getSettings();
-  var style = options.style || settings.chipStyle;
-  var position = options.position || settings.chipPosition;
-  var label = options.label != null && String(options.label).trim() ?
-      String(options.label).trim() : settings.chipLabel;
-  var addNotes = options.addToSpeakerNotes != null ?
-      !!options.addToSpeakerNotes : settings.addToSpeakerNotes;
-
+function noteRecordingInSpeakerNotes(fileId, slideObjectId) {
   var meta = getFileMeta_(fileId);
-  var url = meta.webViewLink;
-  var found = resolveSlide_(options.slideObjectId);
+  var found = resolveSlide_(slideObjectId);
   if (!found) {
-    throw new Error('This presentation has no slides to insert into.');
+    throw new Error('This presentation has no slides.');
   }
-
-  var presentation = SlidesApp.getActivePresentation();
-  var pageWidth = presentation.getPageWidth();
-  var pageHeight = presentation.getPageHeight();
-  var geometry = offsetForExisting(
-      computeChipGeometry(style, label, position, pageWidth, pageHeight),
-      countControlsOnSlide_(found.slide), pageWidth, pageHeight);
-
-  var element = style === 'text' ?
-      insertTextLink_(found.slide, geometry, label, url) :
-      insertChip_(found.slide, geometry, style, label, url);
-
-  element.setTitle(CONTROL_MARKER);
-  element.setDescription('Audio recording: ' + meta.name);
-
-  if (addNotes) {
-    appendSpeakerNote_(found.slide, meta.name + ' - ' + url);
-  }
-
-  return { slideNumber: found.number, objectId: element.getObjectId(), url: url };
-}
-
-/**
- * Inserts the rounded play chip (or dot) and links it to the recording.
- * @param {!Slide} slide Target slide.
- * @param {{left: number, top: number, width: number, height: number}} geometry Placement.
- * @param {string} style 'chip' or 'dot'.
- * @param {string} label Label text.
- * @param {string} url Drive link.
- * @return {!Shape} The inserted shape.
- * @private
- */
-function insertChip_(slide, geometry, style, label, url) {
-  var shapeType = style === 'dot' ? SlidesApp.ShapeType.ELLIPSE : SlidesApp.ShapeType.ROUND_RECTANGLE;
-  var shape = slide.insertShape(shapeType, geometry.left, geometry.top, geometry.width, geometry.height);
-  shape.getFill().setSolidFill(CONTROL_FILL);
-  shape.getBorder().setTransparent();
-  shape.setContentAlignment(SlidesApp.ContentAlignment.MIDDLE);
-
-  // Shape.getText() already returns a TextRange covering the whole shape;
-  // TextRange.getRange() takes two offsets and is not a no-argument accessor.
-  var text = shape.getText();
-  text.setText(chipText(style, label));
-  text.getTextStyle()
-      .setForegroundColor(CONTROL_TEXT)
-      .setFontSize(style === 'dot' ? 12 : 11)
-      .setBold(true);
-  text.getParagraphStyle().setParagraphAlignment(SlidesApp.ParagraphAlignment.CENTER);
-
-  shape.setLinkUrl(url);
-  return shape;
-}
-
-/**
- * Inserts a plain hyperlinked text label.
- * @param {!Slide} slide Target slide.
- * @param {{left: number, top: number, width: number, height: number}} geometry Placement.
- * @param {string} label Label text.
- * @param {string} url Drive link.
- * @return {!Shape} The inserted text box.
- * @private
- */
-function insertTextLink_(slide, geometry, label, url) {
-  var box = slide.insertTextBox(chipText('text', label),
-      geometry.left, geometry.top, geometry.width, geometry.height);
-  box.getText().getTextStyle().setFontSize(11).setLinkUrl(url);
-  return box;
-}
-
-/**
- * Counts the controls this add-on has already placed on a slide.
- * @param {!Slide} slide Target slide.
- * @return {number} Count.
- * @private
- */
-function countControlsOnSlide_(slide) {
-  var count = 0;
-  slide.getPageElements().forEach(function (element) {
-    try {
-      if (element.getTitle() === CONTROL_MARKER) {
-        count++;
-      }
-    } catch (err) {
-      // Some element types do not expose a title; they are not ours.
-    }
-  });
-  return count;
+  appendSpeakerNote_(found.slide, meta.name + ' - ' + meta.webViewLink);
+  return { slideNumber: found.number };
 }
 
 /**

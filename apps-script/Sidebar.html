@@ -16,8 +16,8 @@
   <main>
     <!-- IDLE -->
     <section class="panel" data-panel="idle" data-active>
-      <p class="lead">Recording opens in a separate window. You'll hear your take back here before
-        anything goes on the slide.</p>
+      <p class="lead">Recording opens in a separate window. Name it there, and it is saved to your
+        Drive ready to add to this slide.</p>
 
       <div class="recWrap">
         <div class="recStack">
@@ -34,7 +34,7 @@
       <div id="idle-clips-wrap" hidden>
         <div class="rule" style="margin-bottom:14px"></div>
         <div class="stack tight">
-          <div class="label">Clips in this deck</div>
+          <div class="label">Recordings in this deck</div>
           <div class="stack tight" id="idle-clips"></div>
         </div>
       </div>
@@ -60,70 +60,22 @@
       <div class="err" id="rec-err" hidden></div>
     </section>
 
-    <!-- REVIEW -->
-    <section class="panel" data-panel="review">
-      <div class="stack tight">
-        <div class="label">Review</div>
-        <div class="card">
-          <div class="playRow">
-            <button class="play" id="btn-play" aria-label="Play">&#9654;</button>
-            <div class="bars" id="bars"></div>
-            <span class="time" id="dur" style="margin:0;font-size:11px">0:00</span>
-          </div>
-          <div class="btnRow">
-            <button class="ghost" id="btn-again">Re-record</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="stack tight">
-        <div class="label">Button on the slide</div>
-        <label class="field">
-          <span class="sr-only">Button text</span>
-          <input type="text" id="opt-label" maxlength="60" placeholder="Listen">
-        </label>
-        <div class="radios">
-          <label class="radio"><input type="radio" name="style" value="chip"><span class="box"><b></b></span>Button with text</label>
-          <label class="radio"><input type="radio" name="style" value="dot"><span class="box"><b></b></span>Small round button</label>
-          <label class="radio"><input type="radio" name="style" value="text"><span class="box"><b></b></span>Plain hyperlinked text</label>
-        </div>
-        <p class="note">Opens the recording in a new tab. The next screen shows how to play it in
-          the slide itself.</p>
-      </div>
-
-      <div class="err" id="review-err" hidden></div>
-
-      <div class="stack tight at-end" id="save-block" style="margin-top:auto">
-        <div class="track" id="track" hidden><b id="track-fill"></b></div>
-        <p class="note" id="save-note" hidden></p>
-        <button class="primary" id="btn-insert">Insert into current slide</button>
-      </div>
+    <!-- SAVING -->
+    <section class="panel" data-panel="saving">
+      <div class="label">Saving</div>
+      <p class="lead" id="saving-name">Saving your recording to Drive&hellip;</p>
+      <div class="track"><b id="track-fill"></b></div>
+      <p class="note" id="saving-note"></p>
+      <div class="err" id="saving-err" hidden></div>
     </section>
 
-    <!-- DONE -->
+    <!-- DONE: how to put it on the slide -->
     <section class="panel" data-panel="done">
-      <div class="toast"><span class="tick">&#10003;</span><span id="done-msg">Added to the slide</span></div>
+      <div class="toast"><span class="tick">&#10003;</span><span id="done-msg">Saved to your Drive</span></div>
 
       <div class="howto">
-        <h2>Play it inside the slide</h2>
-        <p>The button opens the recording in a new tab. For playback in the slide itself, add the
-          file with Insert &rsaquo; Audio.</p>
-
-        <div class="demo" id="demo">
-          <div class="d-bar">
-            <span>File</span><span>Edit</span><span>View</span>
-            <span class="d-insert">Insert</span><span>Format</span>
-          </div>
-          <div class="d-menu">
-            <span>Image</span><span>Text box</span><span class="d-audio">Audio</span><span>Video</span>
-          </div>
-          <div class="d-picker">
-            <div class="d-search">Search Drive</div>
-            <div class="d-row"><span class="d-wav">&#9835;</span><span id="demo-file">your recording.wav</span></div>
-            <div class="d-cta"><b>Insert</b></div>
-          </div>
-          <span class="d-cursor"></span>
-        </div>
+        <h2>Add it to your slide</h2>
+        <p>Google only lets you place audio yourself, so this last step is three clicks.</p>
 
         <ol>
           <li>Choose <b>Insert &rsaquo; Audio</b>.</li>
@@ -137,14 +89,10 @@
           <button class="ghost" id="btn-copy-name">Copy</button>
         </div>
         <p class="note" id="native-path" style="margin-top:8px"></p>
+        <button class="ghost" id="btn-show-how" style="width:100%;margin-top:12px">Show me how</button>
       </div>
 
-      <div class="stack tight">
-        <div class="label">Clips in this deck</div>
-        <div class="stack tight" id="done-clips"></div>
-      </div>
-
-      <button class="ghost" id="btn-another" style="margin-top:auto;padding:13px">Record another clip</button>
+      <button class="primary at-end" id="btn-done">Done</button>
     </section>
 
     <!-- SETTINGS -->
@@ -171,20 +119,9 @@
       <p class="note">Applied to each new recording as it is saved. Students cannot hear a recording
         they have no access to.</p>
 
-      <label class="field">
-        <span class="label" style="letter-spacing:.06em">Position on slide</span>
-        <select id="set-position">
-          <option value="bottom-left">Bottom left</option>
-          <option value="bottom-right">Bottom right</option>
-          <option value="top-left">Top left</option>
-          <option value="top-right">Top right</option>
-          <option value="centre">Centre</option>
-        </select>
-      </label>
-
       <label class="check">
         <input type="checkbox" id="set-notes">
-        <span>Also add a link in the speaker notes</span>
+        <span>Add the recording's link to the speaker notes</span>
       </label>
 
       <div class="err" id="settings-err" hidden></div>
@@ -198,7 +135,7 @@
   </main>
 
   <footer>
-    <span id="version">Initio Audio Recorder</span>
+    <span id="version">Audio Recorder</span>
     <a href="#" id="link-settings">Settings</a>
     <a id="link-help" href="#" target="_blank" rel="noopener">Help</a>
   </footer>

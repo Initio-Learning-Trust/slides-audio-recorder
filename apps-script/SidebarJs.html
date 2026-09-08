@@ -2,21 +2,22 @@
 /**
  * Sidebar controller.
  *
- * Five panels, one visible at a time: idle -> rec -> review -> done, plus
+ * Five panels, one visible at a time: idle -> rec -> saving -> done, plus
  * settings. Every state has exactly one primary action.
  *
  * Capture cannot happen here -- Google serves add-on HTML inside a sandboxed
  * iframe with no microphone permission -- so the record button opens a small
- * window on our own origin. That window is a microphone and nothing else: it
- * streams live meter values back so this panel can draw the waveform, and hands
- * over the finished WAV when stopped. Review, insertion and everything the
- * teacher decides happen here.
+ * window on our own origin. That window records, plays the take back and takes
+ * its name; this panel mirrors the live waveform while it runs, saves the
+ * finished audio to Drive, and then shows the teacher how to place it with
+ * Insert > Audio. Nothing is added to the slide by the add-on: the Slides API
+ * has no audio element, and a linked shape would only compete with the real
+ * one.
  */
 (function () {
   'use strict';
 
   var LIVE_BARS = 12;
-  var REVIEW_BARS = 24;
 
   var boot = null;
   var recorderWindow = null;
@@ -24,13 +25,6 @@
   var closeWatch = null;
   var clockTimer = null;
   var startedAt = 0;
-  var cancelRequested = false;
-
-  /** The recording being reviewed, before it is saved. */
-  var take = null;
-
-  /** Peaks streamed from the recording window, used to draw the review bars. */
-  var peaks = [];
 
   var el = {};
   var panels = {};
@@ -96,7 +90,7 @@
    * @param {string} message Text, or empty to clear.
    */
   function fail(message) {
-    ['idle-err', 'rec-err', 'review-err', 'settings-err'].forEach(function (id) {
+    ['idle-err', 'rec-err', 'saving-err', 'settings-err'].forEach(function (id) {
       var box = $(id);
       box.hidden = true;
       box.textContent = '';
@@ -104,7 +98,8 @@
     if (!message) {
       return;
     }
-    var target = { rec: 'rec-err', review: 'review-err', settings: 'settings-err' }[current()] || 'idle-err';
+    var target = { rec: 'rec-err', saving: 'saving-err', settings: 'settings-err' }[current()] ||
+        'idle-err';
     var box = $(target);
     box.textContent = message;
     box.hidden = false;
@@ -181,14 +176,13 @@
       nonce: nonce,
       sampleRate: boot.settings.sampleRate,
       maxBytes: boot.maxBytes,
-      label: el.optLabel.value.trim(),
+      label: '',
       slide: boot.slide && boot.slide.number ? String(boot.slide.number) : ''
     });
 
-    // Close to the 312px sidebar, so the two windows read as one product and
-    // the twelve-bar meter keeps its proportions.
+    // Close to the 312px sidebar, so the two windows read as one product.
     var width = 360;
-    var height = 420;
+    var height = 520;
     var left = Math.max(0, (window.screen.availWidth || 1200) - width - 60);
     var top = Math.max(0, Math.round(((window.screen.availHeight || 800) - height) / 2));
     recorderWindow = window.open(url, 'initioAudioRecorder',
@@ -250,6 +244,11 @@
     if (data.type === SarProtocol.TYPES.STATE) {
       if (data.state === 'recording') {
         beginRecordingState();
+      } else if (data.state === 'review' && current() === 'rec') {
+        // The teacher is naming the take in the other window.
+        stopClock();
+        show('idle');
+        el.idleHint.textContent = 'Finishing in the other window';
       }
       return;
     }
@@ -258,7 +257,7 @@
       return;
     }
     if (data.type === SarProtocol.TYPES.AUDIO) {
-      toReview(data);
+      saveRecording(data);
       return;
     }
     if (data.type === SarProtocol.TYPES.CLOSING && current() === 'rec') {
@@ -272,7 +271,6 @@
   /** Moves to the recording panel and starts the clock. */
   function beginRecordingState() {
     fail('');
-    peaks = [];
     el.scope.classList.add('is-idle');
     startedAt = Date.now();
     tick();
@@ -301,163 +299,63 @@
       return;
     }
     el.scope.classList.remove('is-idle');
-    var sum = 0;
     for (var i = 0; i < el.liveBars.length; i++) {
       var value = Math.max(0.14, Math.min(1, values[i] || 0));
       el.liveBars[i].style.transform = 'scaleY(' + value.toFixed(3) + ')';
-      sum += value;
     }
-    peaks.push(sum / el.liveBars.length);
-  }
-
-  // ---------------------------------------------------------- review panel
-
-  /**
-   * Receives a finished recording and moves to review.
-   * @param {{buffer: !ArrayBuffer, sampleRate: number, durationMs: number}} data The audio message.
-   */
-  function toReview(data) {
-    stopClock();
-    el.scope.classList.add('is-idle');
-
-    if (take && take.url) {
-      URL.revokeObjectURL(take.url);
-    }
-    var blob = new Blob([data.buffer], { type: 'audio/wav' });
-    take = {
-      bytes: new Uint8Array(data.buffer),
-      sampleRate: data.sampleRate,
-      durationMs: data.durationMs,
-      url: URL.createObjectURL(blob),
-      audio: new Audio()
-    };
-    take.audio.src = take.url;
-    take.audio.addEventListener('timeupdate', paintProgress);
-    take.audio.addEventListener('ended', function () {
-      el.btnPlay.innerHTML = '&#9654;';
-      paintProgress();
-    });
-
-    el.dur.textContent = fmt(data.durationMs / 1000);
-    drawReviewBars();
-    el.btnInsert.disabled = false;
-    el.btnInsert.textContent = 'Insert into current slide';
-    el.track.hidden = true;
-    el.saveNote.hidden = true;
-    show('review');
-    el.optLabel.focus();
-  }
-
-  /** Builds the review waveform from the peaks captured while recording. */
-  function drawReviewBars() {
-    el.bars.innerHTML = '';
-    for (var i = 0; i < REVIEW_BARS; i++) {
-      var value;
-      if (peaks.length) {
-        value = peaks[Math.floor(i / REVIEW_BARS * peaks.length)] || 0.2;
-      } else {
-        value = 0.3 + Math.random() * 0.6;
-      }
-      var bar = document.createElement('i');
-      bar.style.height = Math.round(28 + value * 72) + '%';
-      bar.style.animationDelay = (i * 14) + 'ms';
-      el.bars.appendChild(bar);
-    }
-  }
-
-  /** Colours the review bars up to the playhead. */
-  function paintProgress() {
-    var audio = take && take.audio;
-    var fraction = audio && audio.duration ? audio.currentTime / audio.duration : 0;
-    var bars = el.bars.children;
-    var head = Math.floor(fraction * bars.length);
-    for (var i = 0; i < bars.length; i++) {
-      bars[i].className = i < head ? 'played' : (i === head && audio && !audio.paused ? 'cursor' : '');
-    }
-  }
-
-  /** Plays or pauses the take. */
-  function togglePlay() {
-    if (!take) {
-      return;
-    }
-    if (take.audio.paused) {
-      take.audio.play();
-      el.btnPlay.innerHTML = '&#10074;&#10074;';
-    } else {
-      take.audio.pause();
-      el.btnPlay.innerHTML = '&#9654;';
-    }
-  }
-
-  /** Discards the take and reopens the recording window. */
-  function reRecord() {
-    discardTake();
-    openRecorder();
-  }
-
-  /** Releases the current take. */
-  function discardTake() {
-    if (take) {
-      take.audio.pause();
-      URL.revokeObjectURL(take.url);
-      take = null;
-    }
-    peaks = [];
-    el.btnPlay.innerHTML = '&#9654;';
   }
 
   // ---------------------------------------------------------------- saving
 
   /**
-   * Saves the take to Drive and puts a play control on the slide.
+   * Saves a finished recording to Drive.
+   * @param {{buffer: !ArrayBuffer, sampleRate: number, durationMs: number,
+   *          label: string}} data The audio message.
    * @return {!Promise<void>}
    */
-  function saveAndInsert() {
-    if (!take) {
+  function saveRecording(data) {
+    stopClock();
+    var bytes = new Uint8Array(data.buffer);
+    if (!bytes.length) {
+      postToRecorder(SarProtocol.TYPES.REJECTED, { message: 'The recording was empty.' });
       return Promise.resolve();
     }
-    var label = el.optLabel.value.trim();
-    var style = document.querySelector('input[name=style]:checked').value;
 
-    cancelRequested = false;
+    var label = (data.label || '').trim();
     fail('');
-    el.btnInsert.disabled = true;
-    el.btnInsert.textContent = 'Saving…';
-    el.track.hidden = false;
-    el.saveNote.hidden = false;
-    el.saveNote.textContent = 'Saving to your Drive…';
+    show('saving');
+    el.savingName.textContent = label ?
+        'Saving “' + label + '” to your Drive…' : 'Saving your recording to Drive…';
+    el.savingNote.textContent = fmt(data.durationMs / 1000) + ' · ' + fmtSize(bytes.length);
     progress(0);
 
     return call('beginUpload', {
-      totalBytes: take.bytes.length,
-      durationMs: take.durationMs,
-      sampleRate: take.sampleRate,
+      totalBytes: bytes.length,
+      durationMs: data.durationMs,
+      sampleRate: data.sampleRate,
       label: label,
       slideObjectId: null
     }).then(function (session) {
-      return pushChunks(session, take.bytes);
+      return pushChunks(session, bytes);
     }).then(function (recording) {
       postToRecorder(SarProtocol.TYPES.ACCEPTED, {});
-      el.btnInsert.textContent = 'Inserting…';
-      el.saveNote.textContent = 'Adding the play button…';
       progress(1);
-      return call('insertRecording', recording.fileId, {
-        style: style,
-        label: label,
-        position: boot.settings.chipPosition,
-        addToSpeakerNotes: boot.settings.addToSpeakerNotes,
-        slideObjectId: null
-      }).then(function (result) {
-        return finishInsert(recording, result);
-      });
+      if (!boot.settings.addToSpeakerNotes) {
+        return recording;
+      }
+      return call('noteRecordingInSpeakerNotes', recording.fileId, null)
+          .then(function () {
+            return recording;
+          })
+          .catch(function () {
+            // Losing the speaker note must not lose the recording.
+            return recording;
+          });
+    }).then(function (recording) {
+      finish(recording);
     }).catch(function (err) {
       var message = err && err.message ? err.message : 'The recording could not be saved.';
       postToRecorder(SarProtocol.TYPES.REJECTED, { message: message });
-      el.btnInsert.disabled = false;
-      el.btnInsert.textContent = 'Insert into current slide';
-      el.track.hidden = true;
-      el.saveNote.hidden = true;
       fail(message);
     });
   }
@@ -473,11 +371,6 @@
     var total = bytes.length;
 
     function next() {
-      if (cancelRequested) {
-        return call('abortUpload', session.uploadId).then(function () {
-          throw new Error('Saving was cancelled.');
-        });
-      }
       var start = index * session.chunkBytes;
       var slice = bytes.subarray(start, Math.min(start + session.chunkBytes, total));
       return call('pushChunk', session.uploadId, index, toBase64(slice)).then(function (result) {
@@ -501,28 +394,26 @@
   }
 
   /**
-   * Moves to the done panel once a recording is on the slide.
+   * Moves to the panel that teaches Insert > Audio.
    * @param {Object} recording The saved recording.
-   * @param {{slideNumber: number}} result Where it was inserted.
-   * @return {!Promise<void>}
    */
-  function finishInsert(recording, result) {
-    discardTake();
+  function finish(recording) {
     boot.recordings.unshift(recording);
     if (recording.folderId && !boot.folderUrl) {
       boot.folderUrl = 'https://drive.google.com/drive/folders/' + recording.folderId;
+      showFolderLink();
     }
     renderClips();
     updateHowTo(recording);
-    el.doneMsg.textContent = 'Added to slide ' + result.slideNumber;
+    el.doneMsg.textContent = recording.sharingNote || 'Saved to your Drive';
     show('done');
-    return refreshSlide();
+    refreshSlide();
   }
 
   // ------------------------------------------------------------------ done
 
   /**
-   * Fills in the native-audio instructions for the newest recording.
+   * Fills in the instructions for the newest recording.
    * @param {Object} recording The recording to name.
    */
   function updateHowTo(recording) {
@@ -530,8 +421,7 @@
       return;
     }
     el.nativeName.value = recording.name;
-    el.demoFile.textContent = recording.name;
-    el.nativePath.textContent = 'Saved in My Drive › Slide Audio Recordings › ' +
+    el.nativePath.textContent = 'In My Drive › Slide Audio Recordings › ' +
         (boot.presentation ? boot.presentation.name : 'this presentation');
   }
 
@@ -558,15 +448,13 @@
 
   // ------------------------------------------------------------ clip list
 
-  /** Redraws the clip list in both the idle and done panels. */
+  /** Redraws the list of recordings made in this presentation. */
   function renderClips() {
     var items = boot.recordings || [];
     el.idleClipsWrap.hidden = items.length === 0;
-    [el.idleClips, el.doneClips].forEach(function (host) {
-      host.innerHTML = '';
-      items.forEach(function (recording, index) {
-        host.appendChild(clipRow(recording, items.length - index));
-      });
+    el.idleClips.innerHTML = '';
+    items.forEach(function (recording, index) {
+      el.idleClips.appendChild(clipRow(recording, items.length - index));
     });
   }
 
@@ -601,8 +489,10 @@
 
     var acts = document.createElement('span');
     acts.className = 'acts';
-    acts.appendChild(action('Add', function () {
-      insertExisting(recording);
+    acts.appendChild(action('Insert', function () {
+      updateHowTo(recording);
+      el.doneMsg.textContent = 'Ready to add to your slide';
+      show('done');
     }));
     var play = document.createElement('a');
     play.textContent = 'Play';
@@ -640,34 +530,12 @@
   }
 
   /**
-   * Puts an existing recording on the current slide.
-   * @param {Object} recording The recording.
-   */
-  function insertExisting(recording) {
-    fail('');
-    call('insertRecording', recording.fileId, {
-      style: document.querySelector('input[name=style]:checked').value,
-      label: recording.label,
-      position: boot.settings.chipPosition,
-      addToSpeakerNotes: boot.settings.addToSpeakerNotes,
-      slideObjectId: null
-    }).then(function (result) {
-      el.doneMsg.textContent = 'Added to slide ' + result.slideNumber;
-      updateHowTo(recording);
-      show('done');
-      return refreshSlide();
-    }).catch(function (err) {
-      fail(err.message);
-    });
-  }
-
-  /**
    * Moves a recording to the Drive bin.
    * @param {Object} recording The recording.
    */
   function removeClip(recording) {
-    if (!window.confirm('Move this recording to the Drive bin? Any play buttons already on your ' +
-        'slides will stop working.')) {
+    if (!window.confirm('Move this recording to the Drive bin? If it is already on a slide, it will ' +
+        'stop playing.')) {
       return;
     }
     call('deleteRecording', recording.fileId).then(function (updated) {
@@ -689,7 +557,7 @@
       boot.slide = slide;
       el.where.textContent = slide && slide.number ? 'Slide ' + slide.number + ' of ' + slide.total : '';
     }).catch(function () {
-      // Not fatal: the server falls back to the first slide when inserting.
+      // Not fatal: recordings are still named from the server's own view.
     });
   }
 
@@ -697,16 +565,9 @@
 
   /** Copies settings into the form controls. */
   function applySettings() {
-    var s = boot.settings;
-    el.optLabel.value = s.chipLabel;
-    var radio = document.querySelector('input[name=style][value="' + s.chipStyle + '"]');
-    if (radio) {
-      radio.checked = true;
-    }
-    el.setRate.value = String(s.sampleRate);
-    el.setSharing.value = s.sharing;
-    el.setPosition.value = s.chipPosition;
-    el.setNotes.checked = s.addToSpeakerNotes;
+    el.setRate.value = String(boot.settings.sampleRate);
+    el.setSharing.value = boot.settings.sharing;
+    el.setNotes.checked = boot.settings.addToSpeakerNotes;
   }
 
   /**
@@ -718,10 +579,7 @@
     return call('saveSettings', {
       sampleRate: Number(el.setRate.value),
       sharing: el.setSharing.value,
-      chipPosition: el.setPosition.value,
-      addToSpeakerNotes: el.setNotes.checked,
-      chipStyle: document.querySelector('input[name=style]:checked').value,
-      chipLabel: el.optLabel.value.trim()
+      addToSpeakerNotes: el.setNotes.checked
     }).then(function (saved) {
       boot.settings = saved;
       applySettings();
@@ -734,6 +592,17 @@
   }
 
   // ------------------------------------------------------------------ init
+
+  /** Reveals the Drive folder link once a folder exists. */
+  function showFolderLink() {
+    if (!boot.folderUrl) {
+      return;
+    }
+    el.btnFolderOpen.hidden = false;
+    el.btnFolderOpen.onclick = function () {
+      window.open(boot.folderUrl, '_blank', 'noopener');
+    };
+  }
 
   /** Caches element references. */
   function cacheElements() {
@@ -751,26 +620,17 @@
       scope: $('scope'),
       clock: $('clock'),
       btnStop: $('btn-stop'),
-      bars: $('bars'),
-      dur: $('dur'),
-      btnPlay: $('btn-play'),
-      btnAgain: $('btn-again'),
-      optLabel: $('opt-label'),
-      btnInsert: $('btn-insert'),
-      track: $('track'),
+      savingName: $('saving-name'),
+      savingNote: $('saving-note'),
       trackFill: $('track-fill'),
-      saveNote: $('save-note'),
       doneMsg: $('done-msg'),
-      demo: $('demo'),
-      demoFile: $('demo-file'),
+      btnShowHow: $('btn-show-how'),
       nativeName: $('native-name'),
       btnCopyName: $('btn-copy-name'),
       nativePath: $('native-path'),
-      doneClips: $('done-clips'),
-      btnAnother: $('btn-another'),
+      btnDone: $('btn-done'),
       setRate: $('set-rate'),
       setSharing: $('set-sharing'),
-      setPosition: $('set-position'),
       setNotes: $('set-notes'),
       btnSaveSettings: $('btn-save-settings'),
       btnSettingsBack: $('btn-settings-back'),
@@ -785,47 +645,6 @@
     el.liveBars = el.scope.querySelectorAll('i');
   }
 
-  /**
-   * Swaps the CSS demo for a supplied animation when one is configured.
-   *
-   * A looping GIF cannot be stopped, so when the viewer has asked for reduced
-   * motion we use the still frame if one was supplied and otherwise keep the
-   * built-in diagram, which collapses to a static state on its own.
-   *
-   * @param {{url: string, poster: string}} animation Configured URLs.
-   */
-  function useSuppliedAnimation(animation) {
-    var reduced = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var isVideo = /\.(mp4|webm|ogv)(\?|$)/i.test(animation.url);
-    var alt = 'Choose Insert, then Audio, then pick your recording from Drive.';
-
-    if (reduced && !isVideo && !animation.poster) {
-      return;
-    }
-
-    var node;
-    if (isVideo) {
-      node = document.createElement('video');
-      node.src = animation.url;
-      node.loop = true;
-      node.muted = true;
-      node.playsInline = true;
-      node.setAttribute('aria-label', alt);
-      if (animation.poster) {
-        node.poster = animation.poster;
-      }
-      node.autoplay = !reduced;
-      node.controls = reduced;
-    } else {
-      node = document.createElement('img');
-      node.src = reduced ? animation.poster : animation.url;
-      node.alt = alt;
-    }
-    el.demo.innerHTML = '';
-    el.demo.appendChild(node);
-  }
-
   /** Wires the UI and loads state from the server. */
   function init() {
     cacheElements();
@@ -834,14 +653,18 @@
     el.btnStop.addEventListener('click', function () {
       postToRecorder(SarProtocol.TYPES.STOP, {});
     });
-    el.btnPlay.addEventListener('click', togglePlay);
-    el.btnAgain.addEventListener('click', reRecord);
-    el.btnInsert.addEventListener('click', saveAndInsert);
-    el.btnAnother.addEventListener('click', function () {
+    el.btnCopyName.addEventListener('click', copyFileName);
+    el.btnShowHow.addEventListener('click', function () {
+      // The walkthrough is a 960-wide reproduction of the Slides UI, so the
+      // server opens it as a dialog rather than squeezing it in here.
+      call('showHowTo').catch(function (err) {
+        fail(err.message);
+      });
+    });
+    el.btnDone.addEventListener('click', function () {
       show('idle');
       el.idleHint.textContent = 'Tap to record';
     });
-    el.btnCopyName.addEventListener('click', copyFileName);
     el.btnSaveSettings.addEventListener('click', saveSettings);
     el.btnSettingsBack.addEventListener('click', function () {
       show('idle');
@@ -849,12 +672,6 @@
     el.linkSettings.addEventListener('click', function (event) {
       event.preventDefault();
       show('settings');
-    });
-    el.optLabel.addEventListener('keydown', function (event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        saveAndInsert();
-      }
     });
     window.addEventListener('message', onMessage);
 
@@ -864,15 +681,7 @@
       el.title.textContent = boot.addonName;
       el.version.textContent = boot.addonName + ' · v' + boot.version;
       el.linkHelp.href = boot.supportUrl;
-      if (boot.folderUrl) {
-        el.btnFolderOpen.hidden = false;
-        el.btnFolderOpen.addEventListener('click', function () {
-          window.open(boot.folderUrl, '_blank', 'noopener');
-        });
-      }
-      if (boot.howtoAnimation && boot.howtoAnimation.url) {
-        useSuppliedAnimation(boot.howtoAnimation);
-      }
+      showFolderLink();
       applySettings();
       renderClips();
       if (boot.recordings && boot.recordings.length) {

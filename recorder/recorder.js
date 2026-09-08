@@ -6,17 +6,20 @@
  * a policy violation there no matter what the user allows. A top-level window
  * on our own origin has no such restriction.
  *
- * This window is a microphone and nothing else. It streams live meter values
- * back so the sidebar can draw the waveform, and hands over the finished WAV
- * when stopped; reviewing, naming and inserting all happen in the sidebar. It
- * holds no credentials, sets no cookies, writes no storage and talks to no
- * server. Everything it knows arrives in the launch URL.
+ * The teacher records, hears the take back and names it here, then this window
+ * hands the WAV to the sidebar and closes. It streams live meter values while
+ * recording so the sidebar can draw the same waveform. It holds no credentials,
+ * sets no cookies, writes no storage and talks to no server; everything it
+ * knows arrives in the launch URL.
  */
 (function () {
   'use strict';
 
   /** Bars in the live meter; must match the sidebar's scope. */
   var LIVE_BARS = 12;
+
+  /** Bars in the review waveform. */
+  var REVIEW_BARS = 24;
 
   /** How often meter values are posted to the sidebar, in milliseconds. */
   var LEVEL_INTERVAL_MS = 80;
@@ -46,7 +49,14 @@
     btnRecord: document.getElementById('btn-record'),
     hint: document.getElementById('hint'),
     error: document.getElementById('error'),
-    note: document.getElementById('note')
+    note: document.getElementById('note'),
+    bars: document.getElementById('bars'),
+    dur: document.getElementById('dur'),
+    btnPlay: document.getElementById('btn-play'),
+    name: document.getElementById('name'),
+    reviewError: document.getElementById('review-error'),
+    btnAgain: document.getElementById('btn-again'),
+    btnDone: document.getElementById('btn-done')
   };
 
   var state = {
@@ -57,11 +67,14 @@
     analyser: null,
     blocks: [],
     sampleCount: 0,
+    peaks: [],
     startedAt: 0,
     recording: false,
     finishing: false,
     sending: false,
     wav: null,
+    previewUrl: null,
+    audio: null,
     clockTimer: null,
     levelTimer: null
   };
@@ -106,12 +119,18 @@
   }
 
   /**
-   * @param {string} message Line under the record button.
-   * @param {boolean=} done Style it as a success.
+   * @param {string} message Text to show in the review panel, or empty.
    */
-  function setHint(message, done) {
+  function showReviewError(message) {
+    el.reviewError.hidden = !message;
+    el.reviewError.textContent = message || '';
+  }
+
+  /**
+   * @param {string} message Line under the record button.
+   */
+  function setHint(message) {
     el.hint.textContent = message;
-    el.hint.classList.toggle('is-done', !!done);
   }
 
   /**
@@ -150,6 +169,7 @@
     }).then(function () {
       state.blocks = [];
       state.sampleCount = 0;
+      state.peaks = [];
       state.startedAt = Date.now();
       state.recording = true;
 
@@ -265,10 +285,15 @@
     }
   }
 
-  /** Reads the analyser and paints locally, then posts the same values on. */
+  /** Reads the analyser, paints locally, posts the same values on. */
   function sendLevels() {
     var values = readLevels();
     paintScope(values);
+    var sum = 0;
+    values.forEach(function (value) {
+      sum += value;
+    });
+    state.peaks.push(sum / values.length);
     post(SarProtocol.TYPES.LEVELS, { values: values });
   }
 
@@ -303,17 +328,17 @@
     if (values.length) {
       el.scope.classList.remove('is-idle');
     }
-    for (var i = 0; i < el.bars.length; i++) {
-      el.bars[i].style.transform = 'scaleY(' + (values[i] || 0.14).toFixed(3) + ')';
+    for (var i = 0; i < el.liveBars.length; i++) {
+      el.liveBars[i].style.transform = 'scaleY(' + (values[i] || 0.14).toFixed(3) + ')';
     }
   }
 
   /**
-   * Stops capture and hands the audio over.
+   * Stops capture and moves to review.
    *
    * The capture node batches samples, so up to a block is still in flight when
-   * the user presses stop. We ask it to flush and give it a beat to arrive,
-   * otherwise the last word gets clipped.
+   * the user stops. We ask it to flush and give it a beat to arrive, otherwise
+   * the last word gets clipped.
    *
    * @param {string=} note Optional message explaining why it stopped.
    */
@@ -339,7 +364,7 @@
   }
 
   /**
-   * Tears down the audio graph, encodes the WAV and posts it.
+   * Tears down the audio graph, encodes the WAV and offers it for review.
    * @param {string=} note Optional message explaining why it stopped.
    */
   function finaliseStop(note) {
@@ -368,17 +393,9 @@
     state.source = null;
     state.analyser = null;
 
-    el.btnRecord.classList.remove('is-recording');
-    el.btnRecord.setAttribute('aria-label', 'Start recording');
-    el.stack.classList.remove('is-live');
-    el.statusRow.hidden = true;
-    el.scope.hidden = true;
-    el.scope.classList.add('is-idle');
+    resetRecordButton();
 
     if (!state.sampleCount) {
-      el.btnRecord.disabled = false;
-      el.note.textContent = 'Your browser will ask for the microphone.';
-      setHint('Tap to record');
       showError('No audio was captured. Check that the right microphone is selected and try again.');
       post(SarProtocol.TYPES.STATE, { state: 'idle' });
       return;
@@ -391,31 +408,134 @@
     };
     state.blocks = [];
     if (note) {
-      showError(note);
+      showReviewError(note);
     }
-    sendRecording();
+    toReview();
   }
 
-  /** Hands the finished WAV to the sidebar. */
+  /** Returns the record button and its furniture to the resting state. */
+  function resetRecordButton() {
+    el.btnRecord.disabled = false;
+    el.btnRecord.classList.remove('is-recording');
+    el.btnRecord.setAttribute('aria-label', 'Start recording');
+    el.stack.classList.remove('is-live');
+    el.statusRow.hidden = true;
+    el.scope.hidden = true;
+    el.scope.classList.add('is-idle');
+    el.note.textContent = 'Your browser will ask for the microphone.';
+    setHint('Tap to record');
+  }
+
+  // ------------------------------------------------------------------ review
+
+  /** Shows the finished take so it can be heard and named. */
+  function toReview() {
+    if (state.previewUrl) {
+      URL.revokeObjectURL(state.previewUrl);
+    }
+    state.previewUrl = URL.createObjectURL(new Blob([state.wav.buffer], { type: 'audio/wav' }));
+    state.audio = new Audio(state.previewUrl);
+    state.audio.addEventListener('timeupdate', paintProgress);
+    state.audio.addEventListener('ended', function () {
+      el.btnPlay.innerHTML = '&#9654;';
+      paintProgress();
+    });
+
+    el.dur.textContent = fmt(state.wav.durationMs);
+    drawReviewBars();
+    el.btnDone.disabled = false;
+    el.btnDone.textContent = 'Done';
+    el.name.value = params.label || '';
+    show('review');
+    post(SarProtocol.TYPES.STATE, { state: 'review' });
+    el.name.focus();
+  }
+
+  /** Builds the review waveform from the peaks captured while recording. */
+  function drawReviewBars() {
+    el.bars.innerHTML = '';
+    for (var i = 0; i < REVIEW_BARS; i++) {
+      var value = state.peaks.length ?
+          state.peaks[Math.floor(i / REVIEW_BARS * state.peaks.length)] || 0.2 :
+          0.3 + Math.random() * 0.6;
+      var bar = document.createElement('i');
+      bar.style.height = Math.round(28 + value * 72) + '%';
+      bar.style.animationDelay = (i * 14) + 'ms';
+      el.bars.appendChild(bar);
+    }
+  }
+
+  /** Colours the review bars up to the playhead. */
+  function paintProgress() {
+    var audio = state.audio;
+    var fraction = audio && audio.duration ? audio.currentTime / audio.duration : 0;
+    var bars = el.bars.children;
+    var head = Math.floor(fraction * bars.length);
+    for (var i = 0; i < bars.length; i++) {
+      bars[i].className = i < head ? 'played' : (i === head && audio && !audio.paused ? 'cursor' : '');
+    }
+  }
+
+  /** Plays or pauses the take. */
+  function togglePlay() {
+    if (!state.audio) {
+      return;
+    }
+    if (state.audio.paused) {
+      state.audio.play();
+      el.btnPlay.innerHTML = '&#10074;&#10074;';
+    } else {
+      state.audio.pause();
+      el.btnPlay.innerHTML = '&#9654;';
+    }
+  }
+
+  /** Throws the take away and goes back to the record button. */
+  function reRecord() {
+    releaseTake();
+    showReviewError('');
+    show('record');
+    post(SarProtocol.TYPES.STATE, { state: 'idle' });
+    el.btnRecord.focus();
+  }
+
+  /** Releases the preview audio. */
+  function releaseTake() {
+    if (state.audio) {
+      state.audio.pause();
+      state.audio = null;
+    }
+    if (state.previewUrl) {
+      URL.revokeObjectURL(state.previewUrl);
+      state.previewUrl = null;
+    }
+    state.wav = null;
+    state.peaks = [];
+    state.sampleCount = 0;
+    el.btnPlay.innerHTML = '&#9654;';
+  }
+
+  /** Hands the named take to the sidebar. */
   function sendRecording() {
-    if (!state.wav) {
+    if (!state.wav || state.sending) {
       return;
     }
     if (!peer || peer.closed) {
-      el.btnRecord.disabled = false;
-      setHint('Tap to record');
-      showError('The Slides sidebar has closed, so the recording could not be handed over. ' +
+      showReviewError('The Slides sidebar has closed, so the recording could not be handed over. ' +
           'Reopen the sidebar and record again.');
       return;
     }
     state.sending = true;
-    setHint('Sending to your slide…');
+    el.btnDone.disabled = true;
+    el.btnDone.textContent = 'Saving…';
+    showReviewError('');
     post(SarProtocol.TYPES.AUDIO, {
       buffer: state.wav.buffer,
       sampleRate: state.wav.sampleRate,
       durationMs: state.wav.durationMs,
       byteLength: state.wav.buffer.byteLength,
-      mimeType: 'audio/wav'
+      mimeType: 'audio/wav',
+      label: el.name.value.trim()
     });
   }
 
@@ -461,22 +581,20 @@
       return;
     }
     if (data.type === SarProtocol.TYPES.ACCEPTED) {
-      state.wav = null;
+      releaseTake();
       state.sending = false;
-      setHint('Saved', true);
-      el.note.textContent = 'You can close this window.';
-      // The sidebar has the audio and is showing it, so this window is done.
+      el.btnDone.textContent = 'Saved';
+      // The sidebar has the recording and is showing what to do next.
       setTimeout(function () {
         window.close();
-      }, 900);
+      }, 700);
       return;
     }
     if (data.type === SarProtocol.TYPES.REJECTED) {
       state.sending = false;
-      el.btnRecord.disabled = false;
-      el.note.textContent = 'Your browser will ask for the microphone.';
-      setHint('Tap to record');
-      showError(data.message || 'Google Slides could not save that recording. Please try again.');
+      el.btnDone.disabled = false;
+      el.btnDone.textContent = 'Done';
+      showReviewError(data.message || 'Google Slides could not save that recording. Try again.');
     }
   }
 
@@ -488,7 +606,7 @@
     for (var i = 0; i < LIVE_BARS; i++) {
       el.scope.appendChild(document.createElement('i'));
     }
-    el.bars = el.scope.querySelectorAll('i');
+    el.liveBars = el.scope.querySelectorAll('i');
 
     if (!peer || !params.origin || !params.nonce) {
       show('standalone');
@@ -512,8 +630,17 @@
     el.btnRecord.addEventListener('click', function () {
       if (state.recording) {
         stopRecording();
-      } else if (!state.sending) {
+      } else {
         startRecording();
+      }
+    });
+    el.btnPlay.addEventListener('click', togglePlay);
+    el.btnAgain.addEventListener('click', reRecord);
+    el.btnDone.addEventListener('click', sendRecording);
+    el.name.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendRecording();
       }
     });
     window.addEventListener('beforeunload', function (event) {

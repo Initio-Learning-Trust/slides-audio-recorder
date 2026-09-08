@@ -1,15 +1,16 @@
 'use strict';
 
 /**
- * Exercises the slide insertion code against a mock of SlidesApp.
+ * Exercises the presentation-facing code against a mock of SlidesApp.
  *
- * The mock deliberately mirrors the real API's *shape*, not just its method
- * names: TextRange.getRange(start, end) takes two offsets and throws when
- * called with none, exactly as Apps Script does. That arity mistake shipped
- * once -- `Shape.getText()` already returns a TextRange, and calling
- * `.getRange()` on it failed at runtime with "The parameters () don't match
- * the method signature" -- so the mock is written to catch it rather than to
- * make the code pass.
+ * The add-on deliberately puts nothing on the slide, so what is left to test is
+ * that it reads the right slide and that the optional speaker note lands
+ * without disturbing anything else.
+ *
+ * The mock mirrors the API's *shape*, not just its method names:
+ * TextRange.getRange(start, end) takes two offsets and throws when called with
+ * none, exactly as Apps Script does. That arity mistake shipped once, so the
+ * mock is written to catch it rather than to make the code pass.
  */
 
 const test = require('node:test');
@@ -19,26 +20,6 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const APPS_SCRIPT = path.join(__dirname, '..', 'apps-script');
-
-/** Tracks what the code did to the mock, for assertions. */
-function makeRecorder() {
-  return { shapes: [], textBoxes: [], notes: [] };
-}
-
-/**
- * @param {!Object} log Recorder from makeRecorder.
- * @return {!Object} A mock TextStyle that records chained calls.
- */
-function mockTextStyle(log) {
-  const style = {};
-  ['setForegroundColor', 'setFontSize', 'setBold', 'setLinkUrl'].forEach((name) => {
-    style[name] = (value) => {
-      log[name] = value;
-      return style;
-    };
-  });
-  return style;
-}
 
 /**
  * A TextRange whose surface matches Apps Script's.
@@ -50,6 +31,7 @@ function mockTextRange(log) {
   return {
     setText(value) {
       log.text = value;
+      log.paragraphs = 1;
       return this;
     },
     asString() {
@@ -57,18 +39,11 @@ function mockTextRange(log) {
     },
     appendParagraph(value) {
       log.text += '\n' + value;
+      log.paragraphs = (log.paragraphs || 1) + 1;
       return this;
     },
     getTextStyle() {
-      return mockTextStyle(log);
-    },
-    getParagraphStyle() {
-      return {
-        setParagraphAlignment(value) {
-          log.alignment = value;
-          return this;
-        }
-      };
+      return { setFontSize: () => this, setBold: () => this, setLinkUrl: () => this };
     },
     getRange(start, end) {
       // Mirrors the real signature: two offsets, no no-argument overload.
@@ -82,54 +57,28 @@ function mockTextRange(log) {
 }
 
 /**
- * @param {string} kind 'shape' or 'textBox'.
- * @param {!Object} log Where to record calls.
- * @return {!Object} A mock PageElement.
- */
-function mockElement(kind, log) {
-  return {
-    kind,
-    getObjectId: () => log.objectId,
-    getText: () => mockTextRange(log),
-    getFill: () => ({ setSolidFill: (c) => { log.fill = c; } }),
-    getBorder: () => ({ setTransparent: () => { log.border = 'transparent'; } }),
-    setContentAlignment: (v) => { log.contentAlignment = v; },
-    setLinkUrl: (url) => { log.linkUrl = url; },
-    setTitle: (t) => { log.title = t; },
-    setDescription: (d) => { log.description = d; },
-    getTitle: () => log.title
-  };
-}
-
-/**
  * Builds the sandbox: the real add-on sources plus a mock Apps Script.
- * @param {{slides: number, existingControls: number}=} options Scenario setup.
+ * @param {{slides: number, notes: string}=} options Scenario setup.
  * @return {!Object} The sandbox, with `recorded` holding what happened.
  */
 function loadServer(options) {
-  const config = Object.assign({ slides: 3, existingControls: 0 }, options || {});
-  const recorded = makeRecorder();
+  const config = Object.assign({ slides: 3, notes: '' }, options || {});
+  const recorded = { shapes: [], textBoxes: [] };
 
   const slides = [];
   for (let i = 0; i < config.slides; i++) {
-    const existing = [];
-    for (let n = 0; n < config.existingControls; n++) {
-      existing.push(mockElement('shape', { title: 'Slides Audio Recorder' }));
-    }
-    const notesLog = { text: '' };
+    const notesLog = { text: config.notes };
     slides.push({
       getObjectId: () => 'slide-' + (i + 1),
-      getPageElements: () => existing,
       getPageType: () => 'SLIDE',
-      insertShape(type, left, top, width, height) {
-        const log = { objectId: 'shape-' + (recorded.shapes.length + 1), type, left, top, width, height };
-        recorded.shapes.push(log);
-        return mockElement('shape', log);
+      getPageElements: () => [],
+      insertShape() {
+        recorded.shapes.push({});
+        throw new Error('the add-on should not put shapes on the slide');
       },
-      insertTextBox(text, left, top, width, height) {
-        const log = { objectId: 'box-' + (recorded.textBoxes.length + 1), text, left, top, width, height };
-        recorded.textBoxes.push(log);
-        return mockElement('textBox', log);
+      insertTextBox() {
+        recorded.textBoxes.push({});
+        throw new Error('the add-on should not put text boxes on the slide');
       },
       getNotesPage: () => ({
         getSpeakerNotesShape: () => ({ getText: () => mockTextRange(notesLog) })
@@ -140,123 +89,66 @@ function loadServer(options) {
   recorded.slides = slides;
 
   const SlidesApp = {
-    ShapeType: { ROUND_RECTANGLE: 'ROUND_RECTANGLE', ELLIPSE: 'ELLIPSE' },
-    ContentAlignment: { MIDDLE: 'MIDDLE' },
-    ParagraphAlignment: { CENTER: 'CENTER' },
     PageType: { SLIDE: 'SLIDE' },
     getActivePresentation: () => ({
       getId: () => 'presentation-1',
       getName: () => 'French Year 8',
       getSlides: () => slides,
-      getPageWidth: () => 720,
-      getPageHeight: () => 405,
       getSelection: () => ({ getCurrentPage: () => slides[1] })
     })
   };
 
   const sandbox = { SlidesApp, console, recorded };
   vm.createContext(sandbox);
-  ['Config.js', 'Naming.js', 'Layout.js', 'SlidesService.js'].forEach((file) => {
+  ['Config.js', 'Naming.js', 'SlidesService.js'].forEach((file) => {
     vm.runInContext(fs.readFileSync(path.join(APPS_SCRIPT, file), 'utf8'), sandbox, { filename: file });
   });
 
-  // Stub the two collaborators that would otherwise reach Drive and Properties.
-  sandbox.getSettings = () => ({
-    sampleRate: 22050, sharing: 'domain', chipStyle: 'chip', chipLabel: 'Listen',
-    chipPosition: 'bottom-left', addToSpeakerNotes: false, autoInsert: true
-  });
+  // Stub the collaborator that would otherwise reach Drive.
   sandbox.getFileMeta_ = (fileId) => ({
-    id: fileId, name: 'Slide 2 - Bonjour - 2026-09-08 14.32.05.wav',
+    id: fileId,
+    name: 'Slide 2 - Bonjour - 2026-09-08 14.32.05.wav',
     webViewLink: 'https://drive.google.com/file/d/' + fileId + '/view'
   });
 
   return sandbox;
 }
 
-test('inserting a play chip does not misuse the TextRange API', () => {
+test('the speaker note lands on the selected slide', () => {
   const server = loadServer();
-  const result = server.insertRecording('file-1', {});
+  const result = server.noteRecordingInSpeakerNotes('file-1', null);
   assert.equal(result.slideNumber, 2, 'should target the selected slide');
-  assert.equal(result.url, 'https://drive.google.com/file/d/file-1/view');
-  assert.equal(server.recorded.shapes.length, 1);
+  assert.match(server.recorded.slides[1].notesLog.text,
+      /Slide 2 - Bonjour - .*\.wav - https:\/\/drive\.google\.com/);
+  assert.equal(server.recorded.slides[0].notesLog.text, '', 'other slides untouched');
 });
 
-test('the chip is styled, labelled and linked', () => {
+test('an existing note is appended to, not overwritten', () => {
+  const server = loadServer({ notes: 'Remember to pause here.' });
+  server.noteRecordingInSpeakerNotes('file-1', null);
+  const notes = server.recorded.slides[1].notesLog;
+  assert.match(notes.text, /^Remember to pause here\./);
+  assert.equal(notes.paragraphs, 2, 'the note should be a new paragraph');
+});
+
+test('nothing is ever placed on the slide itself', () => {
   const server = loadServer();
-  server.insertRecording('file-1', { label: 'Bonjour' });
-  const shape = server.recorded.shapes[0];
-  assert.equal(shape.type, 'ROUND_RECTANGLE');
-  assert.match(shape.text, /Bonjour$/);
-  assert.equal(shape.fill, '#1A73E8');
-  assert.equal(shape.border, 'transparent');
-  assert.equal(shape.setForegroundColor, '#FFFFFF');
-  assert.equal(shape.setFontSize, 11);
-  assert.equal(shape.setBold, true);
-  assert.equal(shape.alignment, 'CENTER');
-  assert.equal(shape.contentAlignment, 'MIDDLE');
-  assert.equal(shape.linkUrl, 'https://drive.google.com/file/d/file-1/view');
-  assert.equal(shape.title, 'Slides Audio Recorder');
-  assert.match(shape.description, /^Audio recording: /);
-});
-
-test('the dot style inserts a circle with just the glyph', () => {
-  const server = loadServer();
-  server.insertRecording('file-1', { style: 'dot', label: 'ignored' });
-  const shape = server.recorded.shapes[0];
-  assert.equal(shape.type, 'ELLIPSE');
-  assert.equal(shape.width, shape.height);
-  assert.equal(shape.text, '▶');
-  assert.equal(shape.setFontSize, 12);
-});
-
-test('the text style inserts a hyperlinked text box, not a shape', () => {
-  const server = loadServer();
-  server.insertRecording('file-1', { style: 'text', label: 'Listen again' });
-  assert.equal(server.recorded.shapes.length, 0);
-  assert.equal(server.recorded.textBoxes.length, 1);
-  const box = server.recorded.textBoxes[0];
-  assert.match(box.text, /Listen again$/);
-  assert.equal(box.setLinkUrl, 'https://drive.google.com/file/d/file-1/view');
-});
-
-test('a control is placed inside the slide, away from the edges', () => {
-  const server = loadServer();
-  server.insertRecording('file-1', { position: 'bottom-right' });
-  const shape = server.recorded.shapes[0];
-  assert.ok(shape.left >= 0 && shape.left + shape.width <= 720);
-  assert.ok(shape.top >= 0 && shape.top + shape.height <= 405);
-});
-
-test('a second control on the same slide is offset from the first', () => {
-  const plain = loadServer({ existingControls: 0 });
-  plain.insertRecording('file-1', {});
-  const crowded = loadServer({ existingControls: 1 });
-  crowded.insertRecording('file-1', {});
-  assert.notDeepEqual(
-      [crowded.recorded.shapes[0].left, crowded.recorded.shapes[0].top],
-      [plain.recorded.shapes[0].left, plain.recorded.shapes[0].top]);
-});
-
-test('speaker notes are only touched when asked for', () => {
-  const off = loadServer();
-  off.insertRecording('file-1', { addToSpeakerNotes: false });
-  assert.equal(off.recorded.slides[1].notesLog.text, '');
-
-  const on = loadServer();
-  on.insertRecording('file-1', { addToSpeakerNotes: true });
-  assert.match(on.recorded.slides[1].notesLog.text, /\.wav - https:\/\/drive\.google\.com/);
+  server.noteRecordingInSpeakerNotes('file-1', null);
+  assert.deepEqual(server.recorded.shapes, [], 'no shapes');
+  assert.deepEqual(server.recorded.textBoxes, [], 'no text boxes');
+  assert.equal(typeof server.insertRecording, 'undefined',
+      'the chip-insertion entry point should be gone');
 });
 
 test('an explicit slide id wins over the selection', () => {
   const server = loadServer();
-  const result = server.insertRecording('file-1', { slideObjectId: 'slide-3' });
-  assert.equal(result.slideNumber, 3);
+  assert.equal(server.noteRecordingInSpeakerNotes('file-1', 'slide-3').slideNumber, 3);
 });
 
 test('an unknown slide id falls back rather than throwing', () => {
   const server = loadServer();
-  const result = server.insertRecording('file-1', { slideObjectId: 'no-such-slide' });
-  assert.equal(result.slideNumber, 2, 'falls back to the current selection');
+  assert.equal(server.noteRecordingInSpeakerNotes('file-1', 'no-such-slide').slideNumber, 2,
+      'falls back to the current selection');
 });
 
 test('describeCurrentSlide reports the selection and the deck size', () => {

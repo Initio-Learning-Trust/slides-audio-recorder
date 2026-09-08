@@ -158,9 +158,18 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     await sidebar.waitForFunction(() => window.__harness.maxLevel > 0.2, null, { timeout: 8000 });
   });
 
-  await t.test('stopping hands audible WAV audio to the sidebar', async () => {
+  await t.test('stopping moves to review, where the take is named', async () => {
     await recorder.waitForTimeout(1000);
     await recorder.click('#btn-record');
+    await recorder.waitForSelector('[data-panel="review"][data-active]', { timeout: 10000 });
+
+    assert.match(await recorder.textContent('#dur'), /\d+:\d\d/, 'review shows a duration');
+    assert.equal(await recorder.isVisible('#name'), true, 'the take is named here, not in the sidebar');
+    assert.equal(await sidebar.evaluate(() => window.__harness.audio), null,
+        'nothing is handed over until the teacher presses Done');
+
+    await recorder.fill('#name', 'Bonjour tout le monde');
+    await recorder.click('#btn-done');
 
     await sidebar.waitForFunction(() => window.__harness.audio !== null, null, { timeout: 10000 });
     const audio = await sidebar.evaluate(() => window.__harness.audio);
@@ -168,6 +177,7 @@ test('the recorder captures audio and hands it to a page on another origin', asy
     assert.equal(audio.header, 'RIFFWAVE', 'the payload should be a WAV file');
     assert.equal(audio.mimeType, 'audio/wav');
     assert.equal(audio.sampleRate, 22050, 'the requested sample rate should be honoured');
+    assert.equal(audio.label, 'Bonjour tout le monde', 'the name typed in the window comes with it');
     assert.ok(audio.durationMs > 800, 'expected at least ~1s of audio, got ' + audio.durationMs + 'ms');
     assert.ok(audio.byteLength > 44, 'the file should contain samples, not just a header');
     // The reported duration is rounded to whole milliseconds, so compare the

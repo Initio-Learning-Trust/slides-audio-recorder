@@ -7,12 +7,12 @@
 3. Tap the round **record button**. A small recording window opens.
 4. The first time, your browser asks for microphone permission — choose **Allow**.
 5. Tap record in that window and speak. The waveform moves in both windows as you talk.
-6. Tap the button again to stop. The window closes itself and the sidebar shows your take.
-7. Listen back. Not happy? **Re-record**. Happy? Name the button, pick a style, and press
-   **Insert into current slide**.
+6. Tap the button again to stop, then listen back. Not happy? **Re-record**.
+7. Name it and press **Done**. The window closes.
 
-The recording is saved to your Google Drive and a **Listen** button appears on your slide. The
-sidebar then shows you how to make it play inside the slide, if you want that.
+The recording is saved to your Google Drive, and the sidebar shows you the last step: adding it to
+the slide with **Insert ▸ Audio**. Press **Show me how** for an animated walkthrough. The add-on
+puts nothing on your slide itself — Google only lets you place audio yourself.
 
 ## Why does a separate window open?
 

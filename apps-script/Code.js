@@ -16,6 +16,7 @@ function onOpen(e) {
   var ui = SlidesApp.getUi();
   var menu = ui.createAddonMenu();
   menu.addItem('Record audio', 'showSidebar');
+  menu.addItem('How to add audio to a slide', 'showHowTo');
   menu.addItem('Open recordings folder', 'openRecordingsFolder');
   menu.addSeparator();
   menu.addItem('Diagnose microphone access', 'showDiagnostics');
@@ -42,6 +43,18 @@ function showSidebar() {
 }
 
 /**
+ * Shows the animated Insert > Audio walkthrough.
+ *
+ * It lives in a dialog rather than the sidebar because it is a 960-wide
+ * reproduction of the Slides UI; at sidebar width nothing in it would be
+ * readable. Compiled from docs/design/how-to-insert.dc.html by the build.
+ */
+function showHowTo() {
+  var html = HtmlService.createHtmlOutputFromFile('HowTo').setWidth(900).setHeight(660);
+  SlidesApp.getUi().showModalDialog(html, 'Adding your recording to a slide');
+}
+
+/**
  * Shows the microphone permissions diagnostic in a dialog.
  *
  * Support tool: when a teacher reports that recording will not work, this says
@@ -62,7 +75,8 @@ function showHelp() {
       '<li>Open <i>Extensions &rsaquo; ' + escapeHtml_(ADDON_NAME) + ' &rsaquo; Record audio</i>.</li>' +
       '<li>Tap the record button. A small window opens for the microphone; allow it once.</li>' +
       '<li>Tap it again to stop. Your take appears in the sidebar to listen back to.</li>' +
-      '<li>Name the button and press <b>Insert into current slide</b>.</li>' +
+      '<li>Name it and press <b>Done</b>. It is saved to your Drive.</li>' +
+      '<li>Add it to the slide with <b>Insert &rsaquo; Audio</b> &mdash; the sidebar shows you how.</li>' +
       '</ol>' +
       '<p>Recording opens in a separate window because Google does not allow add-on panels to use the microphone.</p>' +
       '<p><a href="' + escapeHtml_(SUPPORT_URL) + '" target="_blank">Full user guide</a> &middot; ' +
@@ -106,7 +120,6 @@ function getBootstrap() {
   return {
     addonName: ADDON_NAME,
     version: ADDON_VERSION,
-    howtoAnimation: getHowToAnimation(),
     recorderUrl: target.url,
     recorderOrigin: target.origin,
     supportUrl: SUPPORT_URL,

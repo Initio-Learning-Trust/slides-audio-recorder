@@ -97,6 +97,7 @@
         byteLength: bytes.length,
         sampleRate: data.sampleRate,
         durationMs: data.durationMs,
+        label: data.label,
         mimeType: data.mimeType,
         header: String.fromCharCode.apply(null, bytes.subarray(0, 4)) +
                 String.fromCharCode.apply(null, bytes.subarray(8, 12)),

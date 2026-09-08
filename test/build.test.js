@@ -93,3 +93,19 @@ test('every asset the recorder page loads is cache-busted', () => {
   });
   assert.ok(html.includes('content="' + version + '"'), 'the meta tag should carry the version');
 });
+
+test('the compiled walkthrough matches its design source', () => {
+  const converter = require('../tools/convert-howto.js');
+  const expected = converter.render(fs.readFileSync(converter.SOURCE, 'utf8'));
+  assert.equal(fs.readFileSync(converter.TARGET, 'utf8'), expected,
+      'apps-script/HowTo.html is stale. Run `npm run build`.');
+});
+
+test('the compiled walkthrough carries none of the design runtime', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'apps-script', 'HowTo.html'), 'utf8');
+  ['<x-dc', '<sc-if', 'support.js', 'DCLogic', '{{'].forEach((token) => {
+    assert.ok(!html.includes(token), token + ' should not survive compilation');
+  });
+  assert.ok(html.includes('data-when="showMenu"'), 'conditional regions should be compiled');
+  assert.ok(html.includes('data-text="caption"'), 'captions should be compiled');
+});

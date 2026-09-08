@@ -31,7 +31,9 @@
                                             Drive: Slide Audio Recordings / <deck> / *.wav
                                                                  │
                                                                  ▼
-                                            Slides: linked play control on the current slide
+                                            Sidebar: the file name, and the walkthrough
+                                            showing Insert > Audio. Nothing is placed on
+                                            the slide by the add-on.
 ```
 
 ## Why a separate recording window
@@ -112,12 +114,12 @@ and a session record is well under the 9 KB per-property limit.
 | `Drive.js` | Drive v3 over `UrlFetchApp`: folders, resumable upload, metadata, sharing |
 | `Upload.js` | Upload sessions and chunk relay |
 | `Library.js` | Per-presentation recording index in Document Properties |
-| `SlidesService.js` | Slide resolution and play-control insertion |
-| `Layout.js` | Pure geometry for the play control (unit tested) |
+| `SlidesService.js` | Slide resolution and the optional speaker note |
 | `Naming.js` | Pure naming, formatting and chunk validation (unit tested) |
+| `HowTo.html` | The Insert > Audio walkthrough, compiled from its design source |
 
-`Layout.js` and `Naming.js` end with a CommonJS export guard so Node can require them directly; the
-guard is inert inside Apps Script.
+`Naming.js` ends with a CommonJS export guard so Node can require it directly; the guard is inert
+inside Apps Script.
 
 ## Where state lives
 
