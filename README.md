@@ -1,8 +1,8 @@
 # Slides Audio Recorder
 
-A Google Workspace Marketplace add-on that lets teachers record audio from a sidebar in Google
-Slides and put it on the slide in one click. Built for language teaching: record a phrase, a model
-pronunciation or a listening prompt directly into the deck, with no downloads, no file juggling and
+A Google Workspace Marketplace add-on that lets teachers record narration for the slide they have
+open, without leaving Google Slides. Built for language teaching: record a phrase, a model
+pronunciation or a listening prompt straight into the deck, with no downloads, no file juggling and
 no separate recording app.
 
 ```

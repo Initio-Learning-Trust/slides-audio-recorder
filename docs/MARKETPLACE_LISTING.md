@@ -15,7 +15,7 @@ which is why this is not "Audio Recorder for Google Slides".
 ## Short description (≤ 200 characters)
 
 ```
-Record your voice in a Google Slides sidebar and add it to the slide in one click. Made for language teachers: model pronunciation, listening prompts and spoken feedback, straight into the deck.
+Record narration for the slide you have open - saved to your Drive, added as a play button. Made for language teachers: pronunciation models, listening prompts and spoken feedback.
 ```
 
 ## Detailed description (< 16,000 characters)
@@ -34,9 +34,10 @@ BUILT FOR LANGUAGE TEACHING
 
 HOW IT WORKS
 1. Extensions > Slides Audio Recorder > Record audio
-2. Press Record. A small recording window opens - allow your microphone once.
-3. Speak, press Stop, and listen back. Record again if you want another take.
-4. Press Use recording. The audio is saved to your Drive and a play button appears on your slide.
+2. Tap the record button. A small recording window opens - allow your microphone once.
+3. Tap record there and speak. The waveform moves in the sidebar as you talk.
+4. Tap it again to stop. The window closes and your take appears in the sidebar to listen back to.
+5. Name the button, pick a style, and press Insert into current slide.
 
 WHY A SEPARATE RECORDING WINDOW?
 Google does not permit add-on sidebars to use the microphone - it is blocked at the browser level
